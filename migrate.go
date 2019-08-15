@@ -36,7 +36,6 @@ func getConn() *gorm.DB {
 		if err != nil {
 			config.AppLogger.Fatal("fail to open connection. Err: ", err.Error())
 		}
-		db.LogMode(config.Env.App.Debug)
 	})
 	return db
 }

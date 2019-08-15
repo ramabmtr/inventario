@@ -11,15 +11,19 @@ create table inventories
 
 create table inventory_variants
 (
-    id         varchar not null
+    id           varchar not null
         constraint inventory_variant_pk
             primary key,
-    sku        varchar   default null,
-    name       varchar   default null,
-    size       varchar   default null,
-    color      varchar   default null,
-    quantity   integer   default 0 not null,
-    created_at timestamp default current_timestamp not null,
-    updated_at timestamp default current_timestamp not null,
-    deleted_at timestamp default null
+    inventory_id varchar not null
+        constraint inventory_variants_inventories_id_fk
+            references inventories
+            on update cascade on delete cascade,
+    sku          varchar   default null,
+    name         varchar   default null,
+    size         varchar   default null,
+    color        varchar   default null,
+    quantity     integer   default 0 not null,
+    created_at   timestamp default current_timestamp not null,
+    updated_at   timestamp default current_timestamp not null,
+    deleted_at   timestamp default null
 );
