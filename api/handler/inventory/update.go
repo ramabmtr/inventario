@@ -22,7 +22,7 @@ type (
 		Name     string `json:"name" validate:"required_without=Size Color"`
 		Size     string `json:"size" validate:"required_without=Name Color"`
 		Color    string `json:"color" validate:"required_without=Name Size"`
-		Quantity int    `json:"quantity" validate:"required"`
+		Quantity int    `json:"quantity"`
 	}
 )
 

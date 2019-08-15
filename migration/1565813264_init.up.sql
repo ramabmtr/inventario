@@ -1,7 +1,7 @@
 create table inventories
 (
     id         varchar not null
-        constraint inventory_pk
+        constraint inventories_pk
             primary key,
     name       varchar not null,
     created_at timestamp default current_timestamp not null,
@@ -12,12 +12,12 @@ create table inventories
 create table inventory_variants
 (
     sku          varchar not null
-        constraint inventory_variant_pk
+        constraint inventory_variants_pk
             primary key,
     inventory_id varchar not null
         constraint inventory_variants_inventories_id_fk
             references inventories
-            on update cascade on delete cascade,
+            on update restrict on delete restrict,
     name         varchar   default null,
     size         varchar   default null,
     color        varchar   default null,

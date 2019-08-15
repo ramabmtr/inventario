@@ -134,7 +134,7 @@ func main() {
 					}
 				}
 
-				if latestMigration != migrationVer {
+				if latestMigration == migrationVer {
 					runMigration = true
 				}
 			}
