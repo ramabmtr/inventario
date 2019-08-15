@@ -32,7 +32,14 @@ func (c *inventoryRepository) GetDetail(inventory *domain.Inventory, fetchVarian
 }
 
 func (c *inventoryRepository) Create(inventory *domain.Inventory) (err error) {
-	return
+	// take out the variant from the struct because the behaviour of lib
+	// that will automatically insert the association struct
+	variant := inventory.Variants
+	inventory.Variants = nil
+	defer func() {
+		inventory.Variants = variant
+	}()
+	return c.db.Create(inventory).Error
 }
 
 func (c *inventoryRepository) Update(inventory *domain.Inventory) (err error) {
@@ -52,7 +59,7 @@ func (c *inventoryVariantRepository) GetDetail(variant *domain.InventoryVariant,
 }
 
 func (c *inventoryVariantRepository) Create(variant *domain.InventoryVariant) (err error) {
-	return
+	return c.db.Create(variant).Error
 }
 
 func (c *inventoryVariantRepository) Update(variant *domain.InventoryVariant) (err error) {

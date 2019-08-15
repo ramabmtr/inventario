@@ -21,6 +21,6 @@ func InitEnvVar() {
 	Env.App.Name = GetEnv("APP_NAME").SetDefault("Inventario").ToString()
 	Env.App.LogEngine = GetEnv("APP_LOG_ENGINE").OneOf(LogEngineLogrus, LogEngineStdlib).SetDefault(LogEngineLogrus).ToString()
 
-	Env.Database.Engine = GetEnv("DATABASE_ENGINE").OneOf("sqlite3").SetDefault("sqlite3").ToString()
+	Env.Database.Engine = GetEnv("DATABASE_ENGINE").OneOf(DatabaseEngineSqlite3).SetDefault(DatabaseEngineSqlite3).ToString()
 	Env.Database.URL = GetEnv("DATABASE_URL").SetDefault("inventario.db").ToString()
 }

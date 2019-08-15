@@ -23,7 +23,7 @@ type (
 		CreatedAt   *time.Time `json:"created_at"`
 		UpdatedAt   *time.Time `json:"updated_at"`
 		DeletedAt   *time.Time `json:"-"`
-		Parent      Inventory  `json:"parent"`
+		Parent      Inventory  `json:"-"`
 	}
 
 	// you can use any database to manage inventory by implementing all interface below

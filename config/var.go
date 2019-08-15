@@ -2,5 +2,7 @@ package config
 
 const (
 	LogEngineStdlib = "stdlib"
-	LogEngineLogrus  = "logrus"
+	LogEngineLogrus = "logrus"
+
+	DatabaseEngineSqlite3 = "sqlite3"
 )
