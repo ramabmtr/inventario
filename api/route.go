@@ -33,22 +33,22 @@ func PublicRouter(g *echo.Group) {
 	)
 
 	g.GET(
-		"/inventories/:inventoryID/variant",
+		"/inventories/:inventoryID/variants",
 		inventory.GetVariantList,
 	)
 
 	g.POST(
-		"/inventories/:inventoryID/variant",
+		"/inventories/:inventoryID/variants",
 		inventory.CreateVariant,
 	)
 
 	g.GET(
-		"/inventories/:inventoryID/variant/:variantID",
+		"/inventories/:inventoryID/variants/:variantID",
 		inventory.GetVariantDetail,
 	)
 
 	g.PUT(
-		"/inventories/:inventoryID/variant/:variantID",
+		"/inventories/:inventoryID/variants/:variantID",
 		inventory.UpdateVariant,
 	)
 }

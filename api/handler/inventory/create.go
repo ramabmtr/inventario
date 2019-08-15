@@ -3,7 +3,6 @@ package inventory
 import (
 	"errors"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -70,12 +69,12 @@ func CreateInventory(c echo.Context) error {
 
 	now := time.Now().UTC()
 
-	variants := make([]domain.Variant, 0)
+	variants := make([]domain.InventoryVariant, 0)
 
 	inventoryID := uuid.New().String()
 
 	for _, v := range param.Variants {
-		variants = append(variants, domain.Variant{
+		variants = append(variants, domain.InventoryVariant{
 			ID:          uuid.New().String(),
 			InventoryID: inventoryID,
 			SKU:         v.SKU,
@@ -108,7 +107,7 @@ func CreateInventory(c echo.Context) error {
 func CreateVariant(c echo.Context) error {
 	var err error
 
-	inventoryID := strings.ToUpper(c.Param("inventoryID"))
+	inventoryID := c.Param("inventoryID")
 	if inventoryID == "" {
 		err := errors.New("inventory id is empty")
 		config.AppLogger.Error(err.Error())
@@ -150,7 +149,7 @@ func CreateVariant(c echo.Context) error {
 
 	inventorySvc := service.NewInventoryService(inventoryRepo, variantRepo)
 
-	variant := domain.Variant{
+	variant := domain.InventoryVariant{
 		ID:          uuid.New().String(),
 		InventoryID: inventoryID,
 		SKU:         param.SKU,
@@ -166,6 +165,6 @@ func CreateVariant(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(variant, "inventory"))
+	return c.JSON(http.StatusCreated, helper.ObjectResponse(variant, "variant"))
 
 }

@@ -2,15 +2,13 @@ package inventory
 
 import (
 	"errors"
-	"net/http"
-	"strconv"
-	"strings"
-
 	"github.com/labstack/echo"
 	"github.com/ramabmtr/inventario/config"
 	"github.com/ramabmtr/inventario/helper"
 	"github.com/ramabmtr/inventario/repository/database/sqlite"
 	"github.com/ramabmtr/inventario/service"
+	"net/http"
+	"strconv"
 )
 
 func GetInventoryList(c echo.Context) error {
@@ -55,7 +53,7 @@ func GetVariantList(c echo.Context) error {
 		offset = config.DefaultOffset
 	}
 
-	inventoryID := strings.ToUpper(c.Param("inventoryID"))
+	inventoryID := c.Param("inventoryID")
 	if inventoryID == "" {
 		err := errors.New("inventory id is empty")
 		config.AppLogger.Error(err.Error())

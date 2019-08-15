@@ -48,19 +48,19 @@ func (c *inventoryService) UpdateInventory(inventory *domain.Inventory) (err err
 	return c.inventory.Update(inventory)
 }
 
-func (c *inventoryService) GetVariantList(inventoryID string, limit, offset int) (variants []domain.Variant, err error) {
+func (c *inventoryService) GetVariantList(inventoryID string, limit, offset int) (variants []domain.InventoryVariant, err error) {
 	return c.variant.GetList(inventoryID, limit, offset)
 }
 
-func (c *inventoryService) GetInventoryVariantDetail(variant *domain.Variant) (err error) {
+func (c *inventoryService) GetInventoryVariantDetail(variant *domain.InventoryVariant) (err error) {
 	return c.variant.GetDetail(variant, true)
 }
 
-func (c *inventoryService) CreateInventoryVariant(variant *domain.Variant) (err error) {
+func (c *inventoryService) CreateInventoryVariant(variant *domain.InventoryVariant) (err error) {
 	return c.variant.Create(variant)
 }
 
-func (c *inventoryService) UpdateInventoryVariant(variant *domain.Variant) (err error) {
+func (c *inventoryService) UpdateInventoryVariant(variant *domain.InventoryVariant) (err error) {
 	now := time.Now().UTC()
 	variant.UpdatedAt = &now
 	return c.variant.Update(variant)

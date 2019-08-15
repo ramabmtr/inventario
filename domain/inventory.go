@@ -4,15 +4,15 @@ import "time"
 
 type (
 	Inventory struct {
-		ID        string     `json:"id"`
-		Name      string     `json:"name"`
-		CreatedAt *time.Time `json:"created_at"`
-		UpdatedAt *time.Time `json:"updated_at"`
-		DeletedAt *time.Time `json:"-"`
-		Variants  []Variant  `json:"variants"`
+		ID        string             `json:"id"`
+		Name      string             `json:"name"`
+		CreatedAt *time.Time         `json:"created_at"`
+		UpdatedAt *time.Time         `json:"updated_at"`
+		DeletedAt *time.Time         `json:"-"`
+		Variants  []InventoryVariant `json:"variants"`
 	}
 
-	Variant struct {
+	InventoryVariant struct {
 		ID          string     `json:"id"`
 		InventoryID string     `json:"inventory_id"`
 		SKU         string     `json:"sku"`
@@ -23,7 +23,7 @@ type (
 		CreatedAt   *time.Time `json:"created_at"`
 		UpdatedAt   *time.Time `json:"updated_at"`
 		DeletedAt   *time.Time `json:"-"`
-		Parent      Inventory  `json:"-"`
+		Parent      *Inventory  `json:"parent,omitempty"`
 	}
 
 	// you can use any database to manage inventory by implementing all interface below
@@ -36,9 +36,9 @@ type (
 	}
 
 	VariantIFace interface {
-		GetList(inventoryID string, limit, offset int) (variants []Variant, err error)
-		GetDetail(inventory *Variant, fetchParent bool) (err error)
-		Create(variant *Variant) (err error)
-		Update(variant *Variant) (err error)
+		GetList(inventoryID string, limit, offset int) (variants []InventoryVariant, err error)
+		GetDetail(inventory *InventoryVariant, fetchParent bool) (err error)
+		Create(variant *InventoryVariant) (err error)
+		Update(variant *InventoryVariant) (err error)
 	}
 )

@@ -3,7 +3,6 @@ package inventory
 import (
 	"errors"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/labstack/echo"
@@ -31,7 +30,7 @@ type (
 func UpdateInventory(c echo.Context) error {
 	var err error
 
-	inventoryID := strings.ToUpper(c.Param("inventoryID"))
+	inventoryID := c.Param("inventoryID")
 	if inventoryID == "" {
 		err := errors.New("inventory id is empty")
 		config.AppLogger.Error(err.Error())
@@ -93,14 +92,14 @@ func UpdateInventory(c echo.Context) error {
 func UpdateVariant(c echo.Context) error {
 	var err error
 
-	inventoryID := strings.ToUpper(c.Param("inventoryID"))
+	inventoryID := c.Param("inventoryID")
 	if inventoryID == "" {
 		err := errors.New("inventory id is empty")
 		config.AppLogger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
-	variantID := strings.ToUpper(c.Param("variantID"))
+	variantID := c.Param("variantID")
 	if variantID == "" {
 		err := errors.New("variant id is empty")
 		config.AppLogger.Error(err.Error())
@@ -156,5 +155,5 @@ func UpdateVariant(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(i, "inventory"))
+	return c.JSON(http.StatusCreated, helper.ObjectResponse(i, "variant"))
 }
