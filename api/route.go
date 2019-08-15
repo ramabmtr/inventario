@@ -12,8 +12,43 @@ func PublicRouter(g *echo.Group) {
 		healthcheck.Ping,
 	)
 
+	g.GET(
+		"/inventories",
+		inventory.GetInventoryList,
+	)
+
 	g.POST(
-		"/inventory",
-		inventory.Create,
+		"/inventories",
+		inventory.CreateInventory,
+	)
+
+	g.GET(
+		"/inventories/:inventoryID",
+		inventory.GetInventoryDetail,
+	)
+
+	g.PUT(
+		"/inventories/:inventoryID",
+		inventory.UpdateInventory,
+	)
+
+	g.GET(
+		"/inventories/:inventoryID/variant",
+		inventory.GetVariantList,
+	)
+
+	g.POST(
+		"/inventories/:inventoryID/variant",
+		inventory.CreateVariant,
+	)
+
+	g.GET(
+		"/inventories/:inventoryID/variant/:variantID",
+		inventory.GetVariantDetail,
+	)
+
+	g.PUT(
+		"/inventories/:inventoryID/variant/:variantID",
+		inventory.UpdateVariant,
 	)
 }

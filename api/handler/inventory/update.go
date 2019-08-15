@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/labstack/echo"
 	"github.com/ramabmtr/inventario/config"
 	"github.com/ramabmtr/inventario/domain"
@@ -16,12 +15,11 @@ import (
 )
 
 type (
-	createInventoryRequestParam struct {
-		Name     string                       `json:"name" validate:"required"`
-		Variants []*createVariantRequestParam `json:"variants" validate:"required,dive,required"`
+	updateInventoryRequestParam struct {
+		Name string `json:"name" validate:"required"`
 	}
 
-	createVariantRequestParam struct {
+	updateInventoryVariantRequestParam struct {
 		SKU      string `json:"sku" validate:"required_without=Name Size Color"`
 		Name     string `json:"name" validate:"required_without=SKU Size Color"`
 		Size     string `json:"size" validate:"required_without=SKU Name Color"`
@@ -30,15 +28,22 @@ type (
 	}
 )
 
-func CreateInventory(c echo.Context) error {
+func UpdateInventory(c echo.Context) error {
 	var err error
 
-	param := new(createInventoryRequestParam)
-	if err = c.Bind(param); err != nil {
+	inventoryID := strings.ToUpper(c.Param("inventoryID"))
+	if inventoryID == "" {
+		err := errors.New("inventory id is empty")
+		config.AppLogger.Error(err.Error())
+		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
+	}
+
+	param := new(updateInventoryRequestParam)
+	if err := c.Bind(param); err != nil {
 		config.AppLogger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
-	if err = c.Validate(param); err != nil {
+	if err := c.Validate(param); err != nil {
 		config.AppLogger.WithField("validate", err.Error()).Warn("request param did not pas the validation")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
@@ -70,42 +75,22 @@ func CreateInventory(c echo.Context) error {
 
 	now := time.Now().UTC()
 
-	variants := make([]domain.Variant, 0)
-
-	inventoryID := uuid.New().String()
-
-	for _, v := range param.Variants {
-		variants = append(variants, domain.Variant{
-			ID:          uuid.New().String(),
-			InventoryID: inventoryID,
-			SKU:         v.SKU,
-			Name:        v.Name,
-			Size:        v.Size,
-			Color:       v.Color,
-			Quantity:    v.Quantity,
-			CreatedAt:   &now,
-			UpdatedAt:   &now,
-		})
-	}
-
 	i := domain.Inventory{
 		ID:        inventoryID,
 		Name:      param.Name,
-		CreatedAt: &now,
 		UpdatedAt: &now,
-		Variants:  variants,
 	}
 
-	err = inventorySvc.CreateInventory(&i)
+	err = inventorySvc.UpdateInventory(&i)
 	if err != nil {
-		config.AppLogger.WithError(err).Error("fail to process create inventory")
+		config.AppLogger.WithError(err).Error("fail to process update inventory")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
 	return c.JSON(http.StatusCreated, helper.ObjectResponse(i, "inventory"))
 }
 
-func CreateVariant(c echo.Context) error {
+func UpdateVariant(c echo.Context) error {
 	var err error
 
 	inventoryID := strings.ToUpper(c.Param("inventoryID"))
@@ -115,12 +100,19 @@ func CreateVariant(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
-	param := new(createVariantRequestParam)
-	if err = c.Bind(param); err != nil {
+	variantID := strings.ToUpper(c.Param("variantID"))
+	if variantID == "" {
+		err := errors.New("variant id is empty")
+		config.AppLogger.Error(err.Error())
+		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
+	}
+
+	param := new(updateInventoryRequestParam)
+	if err := c.Bind(param); err != nil {
 		config.AppLogger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
-	if err = c.Validate(param); err != nil {
+	if err := c.Validate(param); err != nil {
 		config.AppLogger.WithField("validate", err.Error()).Warn("request param did not pas the validation")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
@@ -150,22 +142,19 @@ func CreateVariant(c echo.Context) error {
 
 	inventorySvc := service.NewInventoryService(inventoryRepo, variantRepo)
 
-	variant := domain.Variant{
-		ID:          uuid.New().String(),
-		InventoryID: inventoryID,
-		SKU:         param.SKU,
-		Name:        param.Name,
-		Size:        param.Size,
-		Color:       param.Color,
-		Quantity:    param.Quantity,
+	now := time.Now().UTC()
+
+	i := domain.Inventory{
+		ID:        inventoryID,
+		Name:      param.Name,
+		UpdatedAt: &now,
 	}
 
-	err = inventorySvc.CreateInventoryVariant(&variant)
+	err = inventorySvc.UpdateInventory(&i)
 	if err != nil {
-		config.AppLogger.WithError(err).Error("fail to process create inventory")
+		config.AppLogger.WithError(err).Error("fail to process update inventory")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(variant, "inventory"))
-
+	return c.JSON(http.StatusCreated, helper.ObjectResponse(i, "inventory"))
 }
