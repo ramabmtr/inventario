@@ -43,7 +43,7 @@ func PublicRouter(g *echo.Group) {
 	)
 
 	g.GET(
-		"/inventories/:inventoryID/variants/:variantID",
+		"/inventories/:inventoryID/variants/:variantSKU",
 		inventory.GetVariantDetail,
 	)
 

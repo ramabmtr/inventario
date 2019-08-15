@@ -2,13 +2,14 @@ package inventory
 
 import (
 	"errors"
+	"net/http"
+
 	"github.com/labstack/echo"
 	"github.com/ramabmtr/inventario/config"
 	"github.com/ramabmtr/inventario/domain"
 	"github.com/ramabmtr/inventario/helper"
 	"github.com/ramabmtr/inventario/repository/database/sqlite"
 	"github.com/ramabmtr/inventario/service"
-	"net/http"
 )
 
 func GetInventoryDetail(c echo.Context) error {
@@ -55,9 +56,9 @@ func GetVariantDetail(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
-	variantID := c.Param("variantID")
-	if variantID == "" {
-		err := errors.New("variant id is empty")
+	variantSKU := c.Param("variantSKU")
+	if variantSKU == "" {
+		err := errors.New("variant sku is empty")
 		config.AppLogger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
@@ -70,7 +71,7 @@ func GetVariantDetail(c echo.Context) error {
 	inventorySvc := service.NewInventoryService(inventoryRepo, variantRepo)
 
 	variant := domain.InventoryVariant{
-		ID:          variantID,
+		SKU:         variantSKU,
 		InventoryID: inventoryID,
 	}
 

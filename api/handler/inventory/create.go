@@ -21,10 +21,10 @@ type (
 	}
 
 	createVariantRequestParam struct {
-		SKU      string `json:"sku" validate:"required_without=Name Size Color"`
-		Name     string `json:"name" validate:"required_without=SKU Size Color"`
-		Size     string `json:"size" validate:"required_without=SKU Name Color"`
-		Color    string `json:"color" validate:"required_without=SKU Name Size"`
+		SKU      string `json:"sku" validate:"required"`
+		Name     string `json:"name" validate:"required_without=Size Color"`
+		Size     string `json:"size" validate:"required_without=Name Color"`
+		Color    string `json:"color" validate:"required_without=Name Size"`
 		Quantity int    `json:"quantity" validate:"required"`
 	}
 )
@@ -75,9 +75,8 @@ func CreateInventory(c echo.Context) error {
 
 	for _, v := range param.Variants {
 		variants = append(variants, domain.InventoryVariant{
-			ID:          uuid.New().String(),
-			InventoryID: inventoryID,
 			SKU:         v.SKU,
+			InventoryID: inventoryID,
 			Name:        v.Name,
 			Size:        v.Size,
 			Color:       v.Color,
@@ -150,9 +149,8 @@ func CreateVariant(c echo.Context) error {
 	inventorySvc := service.NewInventoryService(inventoryRepo, variantRepo)
 
 	variant := domain.InventoryVariant{
-		ID:          uuid.New().String(),
-		InventoryID: inventoryID,
 		SKU:         param.SKU,
+		InventoryID: inventoryID,
 		Name:        param.Name,
 		Size:        param.Size,
 		Color:       param.Color,

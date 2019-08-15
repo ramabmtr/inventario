@@ -19,10 +19,9 @@ type (
 	}
 
 	updateInventoryVariantRequestParam struct {
-		SKU      string `json:"sku" validate:"required_without=Name Size Color"`
-		Name     string `json:"name" validate:"required_without=SKU Size Color"`
-		Size     string `json:"size" validate:"required_without=SKU Name Color"`
-		Color    string `json:"color" validate:"required_without=SKU Name Size"`
+		Name     string `json:"name" validate:"required_without=Size Color"`
+		Size     string `json:"size" validate:"required_without=Name Color"`
+		Color    string `json:"color" validate:"required_without=Name Size"`
 		Quantity int    `json:"quantity" validate:"required"`
 	}
 )
@@ -99,14 +98,14 @@ func UpdateVariant(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
-	variantID := c.Param("variantID")
-	if variantID == "" {
+	variantSKU := c.Param("variantSKU")
+	if variantSKU == "" {
 		err := errors.New("variant id is empty")
 		config.AppLogger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
-	param := new(updateInventoryRequestParam)
+	param := new(updateInventoryVariantRequestParam)
 	if err := c.Bind(param); err != nil {
 		config.AppLogger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
@@ -143,17 +142,21 @@ func UpdateVariant(c echo.Context) error {
 
 	now := time.Now().UTC()
 
-	i := domain.Inventory{
-		ID:        inventoryID,
-		Name:      param.Name,
-		UpdatedAt: &now,
+	variant := domain.InventoryVariant{
+		SKU:         variantSKU,
+		InventoryID: inventoryID,
+		Name:        param.Name,
+		Color:       param.Color,
+		Size:        param.Size,
+		Quantity:    param.Quantity,
+		UpdatedAt:   &now,
 	}
 
-	err = inventorySvc.UpdateInventory(&i)
+	err = inventorySvc.UpdateInventoryVariant(&variant)
 	if err != nil {
 		config.AppLogger.WithError(err).Error("fail to process update inventory")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(i, "variant"))
+	return c.JSON(http.StatusCreated, helper.ObjectResponse(variant, "variant"))
 }

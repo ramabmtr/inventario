@@ -44,7 +44,9 @@ func (c *inventoryRepository) GetDetail(inventory *domain.Inventory, fetchVarian
 }
 
 func (c *inventoryRepository) Create(inventory *domain.Inventory) (err error) {
-	err = c.db.Set("gorm:association_autoupdate", false).Create(inventory).Error
+	err = c.db.Set("gorm:association_autoupdate", false).
+		Set("gorm:association_autocreate", false).
+		Create(inventory).Error
 	return helper.TranslateSqliteError(err)
 }
 

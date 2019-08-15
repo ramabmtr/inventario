@@ -13,9 +13,8 @@ type (
 	}
 
 	InventoryVariant struct {
-		ID          string     `json:"id"`
-		InventoryID string     `json:"inventory_id"`
 		SKU         string     `json:"sku"`
+		InventoryID string     `json:"inventory_id"`
 		Name        string     `json:"name"`
 		Size        string     `json:"size"`
 		Color       string     `json:"color"`
@@ -23,7 +22,7 @@ type (
 		CreatedAt   *time.Time `json:"created_at"`
 		UpdatedAt   *time.Time `json:"updated_at"`
 		DeletedAt   *time.Time `json:"-"`
-		Parent      *Inventory  `json:"parent,omitempty"`
+		Parent      *Inventory `json:"parent,omitempty"`
 	}
 
 	// you can use any database to manage inventory by implementing all interface below
