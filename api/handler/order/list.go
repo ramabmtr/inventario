@@ -37,6 +37,9 @@ func GetOrderList(c echo.Context) error {
 		logger.WithError(err).Error("fail to parse end date")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
+	// since endDate just contain the date (the time will set to default 00:00:00),
+	// add time 23:59:59 to endDate (to make endDate to the end of the day).
+	endDate = endDate.Add(23*time.Hour + 59*time.Minute + 59*time.Second)
 
 	db := config.GetDatabaseClient()
 
