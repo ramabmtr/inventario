@@ -21,11 +21,10 @@ type (
 	}
 
 	createVariantRequestParam struct {
-		SKU      string `json:"sku" validate:"required"`
-		Name     string `json:"name" validate:"required_without=Size Color"`
-		Size     string `json:"size" validate:"required_without=Name Color"`
-		Color    string `json:"color" validate:"required_without=Name Size"`
-		Quantity int    `json:"quantity"`
+		SKU   string `json:"sku" validate:"required"`
+		Name  string `json:"name" validate:"required_without=Size Color"`
+		Size  string `json:"size" validate:"required_without=Name Color"`
+		Color string `json:"color" validate:"required_without=Name Size"`
 	}
 )
 
@@ -80,7 +79,6 @@ func CreateInventory(c echo.Context) error {
 			Name:        v.Name,
 			Size:        v.Size,
 			Color:       v.Color,
-			Quantity:    v.Quantity,
 			CreatedAt:   &now,
 			UpdatedAt:   &now,
 		})
@@ -154,7 +152,6 @@ func CreateVariant(c echo.Context) error {
 		Name:        param.Name,
 		Size:        param.Size,
 		Color:       param.Color,
-		Quantity:    param.Quantity,
 	}
 
 	err = inventorySvc.CreateInventoryVariant(&variant)

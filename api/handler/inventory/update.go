@@ -19,10 +19,9 @@ type (
 	}
 
 	updateInventoryVariantRequestParam struct {
-		Name     string `json:"name" validate:"required_without=Size Color"`
-		Size     string `json:"size" validate:"required_without=Name Color"`
-		Color    string `json:"color" validate:"required_without=Name Size"`
-		Quantity int    `json:"quantity"`
+		Name  string `json:"name" validate:"required_without=Size Color"`
+		Size  string `json:"size" validate:"required_without=Name Color"`
+		Color string `json:"color" validate:"required_without=Name Size"`
 	}
 )
 
@@ -148,7 +147,6 @@ func UpdateVariant(c echo.Context) error {
 		Name:        param.Name,
 		Color:       param.Color,
 		Size:        param.Size,
-		Quantity:    param.Quantity,
 		UpdatedAt:   &now,
 	}
 

@@ -8,4 +8,7 @@ const (
 
 	DefaultLimit  = 10
 	DefaultOffset = 0
+
+	IncomingTransactionType = "IN"
+	OutgoingTransactionType = "OUT"
 )
