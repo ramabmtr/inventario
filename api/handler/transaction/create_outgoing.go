@@ -15,7 +15,7 @@ import (
 )
 
 type (
-	createTransactionRequestParam struct {
+	createOutgoingTransactionRequestParam struct {
 		ID         string  `json:"id"`
 		VariantSKU string  `json:"variant_sku" validate:"required"`
 		Quantity   int     `json:"quantity" validate:"required"`
@@ -26,7 +26,7 @@ type (
 func CreateOutgoingTransaction(c echo.Context) error {
 	var err error
 
-	param := new(createTransactionRequestParam)
+	param := new(createOutgoingTransactionRequestParam)
 	if err = c.Bind(param); err != nil {
 		logger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
@@ -78,10 +78,10 @@ func CreateOutgoingTransaction(c echo.Context) error {
 		UpdatedAt:  &now,
 	}
 
-	err = trxSvc.CreateTransaction(&trx)
+	code, err := trxSvc.CreateOutgoingTransaction(&trx)
 	if err != nil {
 		logger.WithError(err).Error("fail to process create transaction")
-		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
+		return c.JSON(code, helper.ErrorResponse(err.Error()))
 	}
 
 	return c.JSON(http.StatusOK, helper.ObjectResponse(trx, "transaction"))

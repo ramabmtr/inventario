@@ -16,7 +16,7 @@ import (
 )
 
 type (
-	createTransactionRequestParam struct {
+	createIncomingTransactionRequestParam struct {
 		ID       string  `json:"id"`
 		Quantity int     `json:"quantity" validate:"required"`
 		Price    float64 `json:"price"`
@@ -33,7 +33,7 @@ func CreateIncomingTransaction(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
-	param := new(createTransactionRequestParam)
+	param := new(createIncomingTransactionRequestParam)
 	if err = c.Bind(param); err != nil {
 		logger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
