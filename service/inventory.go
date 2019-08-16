@@ -49,7 +49,10 @@ func (c *inventoryService) UpdateInventory(inventory *domain.Inventory) (err err
 }
 
 func (c *inventoryService) GetVariantList(inventoryID string, limit, offset int) (variants []domain.InventoryVariant, err error) {
-	return c.variant.GetList(inventoryID, limit, offset)
+	variant := domain.InventoryVariant{
+		InventoryID: inventoryID,
+	}
+	return c.variant.GetList(variant, limit, offset)
 }
 
 func (c *inventoryService) GetInventoryVariantDetail(variant *domain.InventoryVariant) (err error) {

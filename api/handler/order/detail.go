@@ -36,11 +36,11 @@ func GetOrderDetail(c echo.Context) error {
 	err = orderSvc.GetOrderDetail(&order)
 	if err == config.ErrNotFound {
 		logger.WithError(err).Error("order not found")
-		c.JSON(http.StatusNotFound, helper.FailResponse(err.Error()))
+		return c.JSON(http.StatusNotFound, helper.FailResponse(err.Error()))
 	}
 	if err != nil {
 		logger.WithError(err).Error("fail to process get order detail")
-		c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
+		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
 	return c.JSON(http.StatusOK, helper.ObjectResponse(order, "order"))

@@ -33,6 +33,6 @@ func PublicRouter(g *echo.Group) {
 	g.GET("/transactions", transaction.GetTransactionList)
 	g.POST("/transactions", transaction.CreateOutgoingTransaction)
 
-	g.GET("/reports/inventory", report.InventoryReport)
+	g.GET("/reports/inventories", report.InventoryReport)
 	g.GET("/reports/sales", report.SalesReport)
 }

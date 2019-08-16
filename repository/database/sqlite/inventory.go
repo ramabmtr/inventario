@@ -62,31 +62,29 @@ func NewVariantRepository(db *gorm.DB) domain.VariantIFace {
 	}
 }
 
-func (c *variantRepository) GetList(inventoryID string, limit, offset int) (variants []domain.InventoryVariant, err error) {
+func (c *variantRepository) GetAll(variant domain.InventoryVariant, showEmptyStock bool) (variants []domain.InventoryVariant, err error) {
 	variants = make([]domain.InventoryVariant, 0)
-	queryVariant := domain.InventoryVariant{
-		InventoryID: inventoryID,
+	q := c.db.Preload("Inventory").
+		Where(&variant)
+	if !showEmptyStock {
+		q = q.Where("quantity > ?", 0)
 	}
-	err = c.db.Where(&queryVariant).Find(&variants).Limit(limit).Offset(offset).Error
+	err = q.Find(&variants).Error
 	return variants, helper.TranslateSqliteError(err)
 }
 
-func (c *variantRepository) GetDetail(variant *domain.InventoryVariant, fetchParent bool) (err error) {
-	err = c.db.Where(variant).First(variant).Error
-	if err != nil {
-		return helper.TranslateSqliteError(err)
-	}
-	i := domain.Inventory{
-		ID: variant.InventoryID,
-	}
-	err = c.db.Where(&i).First(&i).Error
-	if err != nil {
-		return helper.TranslateSqliteError(err)
-	}
+func (c *variantRepository) GetList(variant domain.InventoryVariant, limit, offset int) (variants []domain.InventoryVariant, err error) {
+	variants = make([]domain.InventoryVariant, 0)
+	err = c.db.Where(&variant).Find(&variants).Limit(limit).Offset(offset).Error
+	return variants, helper.TranslateSqliteError(err)
+}
 
-	variant.Parent = &i
-
-	return nil
+func (c *variantRepository) GetDetail(variant *domain.InventoryVariant, fetchInventory bool) (err error) {
+	q := c.db
+	if fetchInventory {
+		q = q.Preload("Inventory")
+	}
+	return q.Where(variant).First(variant).Error
 }
 
 func (c *variantRepository) Create(variant *domain.InventoryVariant) (err error) {

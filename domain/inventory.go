@@ -27,7 +27,7 @@ type (
 		CreatedAt   *time.Time `json:"created_at"`
 		UpdatedAt   *time.Time `json:"updated_at"`
 		DeletedAt   *time.Time `json:"-"`
-		Parent      *Inventory `json:"parent,omitempty"`
+		Inventory   *Inventory `json:"inventory,omitempty"`
 	}
 
 	// you can use any database to manage inventory by implementing all interface below
@@ -40,8 +40,9 @@ type (
 	}
 
 	VariantIFace interface {
-		GetList(inventoryID string, limit, offset int) (variants []InventoryVariant, err error)
-		GetDetail(inventory *InventoryVariant, fetchParent bool) (err error)
+		GetAll(variant InventoryVariant, showEmptyStock bool) (variants []InventoryVariant, err error)
+		GetList(variant InventoryVariant, limit, offset int) (variants []InventoryVariant, err error)
+		GetDetail(variant *InventoryVariant, fetchInventory bool) (err error)
 		Create(variant *InventoryVariant) (err error)
 		Update(sku string, variant *InventoryVariant) (err error)
 	}

@@ -23,6 +23,16 @@ func NewOrderRepository(db *gorm.DB) domain.OrderIFace {
 	}
 }
 
+func (c *orderRepository) GetAll(order domain.Order, fetchTransaction bool) (orders []domain.Order, err error) {
+	q := c.db.Where(order)
+	if fetchTransaction {
+		q = q.Preload("Transactions")
+	}
+	err = q.Find(&orders).Error
+
+	return
+}
+
 func (c *orderRepository) GetDetail(order *domain.Order) (err error) {
 	err = c.db.Where(order).
 		Preload("Transactions").

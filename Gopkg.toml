@@ -26,6 +26,10 @@
 
 
 [[constraint]]
+  branch = "master"
+  name = "github.com/facebookgo/grace"
+
+[[constraint]]
   name = "github.com/go-playground/validator"
   version = "9.29.1"
 
@@ -38,8 +42,16 @@
   version = "1.9.10"
 
 [[constraint]]
+  name = "github.com/json-iterator/go"
+  version = "1.1.7"
+
+[[constraint]]
   name = "github.com/labstack/echo"
   version = "3.3.10"
+
+[[constraint]]
+  name = "github.com/shopspring/decimal"
+  version = "1.1.0"
 
 [[constraint]]
   name = "github.com/sirupsen/logrus"
@@ -48,11 +60,3 @@
 [prune]
   go-tests = true
   unused-packages = true
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/facebookgo/grace"
-
-[[constraint]]
-  name = "github.com/json-iterator/go"
-  version = "1.1.7"
