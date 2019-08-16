@@ -70,7 +70,6 @@ func CreateInventory(c echo.Context) error {
 		variants = append(variants, domain.InventoryVariant{
 			SKU:         v.SKU,
 			InventoryID: inventoryID,
-			Name:        v.Name,
 			Size:        v.Size,
 			Color:       v.Color,
 			CreatedAt:   &now,

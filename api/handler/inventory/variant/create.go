@@ -16,9 +16,8 @@ import (
 type (
 	CreateVariantRequestParam struct {
 		SKU   string `json:"sku" validate:"required"`
-		Name  string `json:"name" validate:"required_without=Size Color"`
-		Size  string `json:"size" validate:"required_without=Name Color"`
-		Color string `json:"color" validate:"required_without=Name Size"`
+		Size  string `json:"size" validate:"required_without=Color"`
+		Color string `json:"color" validate:"required_without=Name"`
 	}
 )
 
@@ -70,7 +69,6 @@ func CreateVariant(c echo.Context) error {
 	variant := domain.InventoryVariant{
 		SKU:         param.SKU,
 		InventoryID: inventoryID,
-		Name:        param.Name,
 		Size:        param.Size,
 		Color:       param.Color,
 	}

@@ -20,7 +20,6 @@ type (
 	InventoryVariant struct {
 		SKU         string     `json:"sku"`
 		InventoryID string     `json:"inventory_id"`
-		Name        string     `json:"name"`
 		Size        string     `json:"size"`
 		Color       string     `json:"color"`
 		Quantity    int        `json:"quantity"`

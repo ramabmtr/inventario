@@ -16,9 +16,8 @@ import (
 
 type (
 	updateInventoryVariantRequestParam struct {
-		Name  string `json:"name" validate:"required_without=Size Color"`
-		Size  string `json:"size" validate:"required_without=Name Color"`
-		Color string `json:"color" validate:"required_without=Name Size"`
+		Size  string `json:"size" validate:"required_without=Color"`
+		Color string `json:"color" validate:"required_without=Size"`
 	}
 )
 
@@ -78,7 +77,6 @@ func UpdateVariant(c echo.Context) error {
 
 	variant := domain.InventoryVariant{
 		InventoryID: inventoryID,
-		Name:        param.Name,
 		Color:       param.Color,
 		Size:        param.Size,
 		UpdatedAt:   &now,

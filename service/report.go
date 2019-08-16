@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/ramabmtr/inventario/domain"
@@ -63,7 +62,9 @@ func (c *reportService) GetInventoryReport(showEmptyStock bool) (res *domain.Inv
 
 		iList := domain.InventoryListReport{
 			SKU:                  v.SKU,
-			Name:                 fmt.Sprintf("%s (%s, %s)", v.Inventory.Name, v.Size, v.Color),
+			Name:                 v.Inventory.Name,
+			Size:                 v.Size,
+			Color:                v.Color,
 			TotalAvailableItem:   v.Quantity,
 			AveragePurchasePrice: averagePrice.Ceil().IntPart(),
 			TotalItemPrice:       totalItemPrice.Ceil().IntPart(),

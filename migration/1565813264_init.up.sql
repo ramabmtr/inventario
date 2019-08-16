@@ -18,7 +18,6 @@ create table inventory_variants
         constraint inventory_variants_inventories_id_fk
             references inventories
             on update restrict on delete restrict,
-    name         varchar   default null,
     size         varchar   default null,
     color        varchar   default null,
     quantity     integer   default 0 not null,

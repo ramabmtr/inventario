@@ -19,6 +19,8 @@ type (
 	InventoryListReport struct {
 		SKU                  string `json:"sku"`
 		Name                 string `json:"name"`
+		Size                 string `json:"size"`
+		Color                string `json:"color"`
 		TotalAvailableItem   int    `json:"total_available_item"`
 		AveragePurchasePrice int64  `json:"average_purchase_price"`
 		TotalItemPrice       int64  `json:"total_item_price"`
