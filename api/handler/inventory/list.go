@@ -2,13 +2,15 @@ package inventory
 
 import (
 	"errors"
+	"net/http"
+	"strconv"
+
 	"github.com/labstack/echo"
 	"github.com/ramabmtr/inventario/config"
 	"github.com/ramabmtr/inventario/helper"
+	"github.com/ramabmtr/inventario/logger"
 	"github.com/ramabmtr/inventario/repository/database/sqlite"
 	"github.com/ramabmtr/inventario/service"
-	"net/http"
-	"strconv"
 )
 
 func GetInventoryList(c echo.Context) error {
@@ -33,7 +35,7 @@ func GetInventoryList(c echo.Context) error {
 
 	inventories, err := inventorySvc.GetInventoryList(limit, offset)
 	if err != nil {
-		config.AppLogger.WithError(err).Error("fail to process get inventory list")
+		logger.WithError(err).Error("fail to process get inventory list")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
@@ -56,7 +58,7 @@ func GetVariantList(c echo.Context) error {
 	inventoryID := c.Param("inventoryID")
 	if inventoryID == "" {
 		err := errors.New("inventory id is empty")
-		config.AppLogger.Error(err.Error())
+		logger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
@@ -69,7 +71,7 @@ func GetVariantList(c echo.Context) error {
 
 	variants, err := inventorySvc.GetVariantList(inventoryID, limit, offset)
 	if err != nil {
-		config.AppLogger.WithError(err).Error("fail to process get variant list")
+		logger.WithError(err).Error("fail to process get variant list")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 

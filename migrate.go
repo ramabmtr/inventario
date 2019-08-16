@@ -16,6 +16,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/ramabmtr/inventario/config"
+	"github.com/ramabmtr/inventario/logger"
 )
 
 const (
@@ -34,16 +35,18 @@ func getConn() *gorm.DB {
 	once.Do(func() {
 		db, err = gorm.Open(config.Env.Database.Engine, config.Env.Database.URL)
 		if err != nil {
-			config.AppLogger.Fatal("fail to open connection. Err: ", err.Error())
+			logger.Fatal("fail to open connection. Err: ", err.Error())
 		}
 	})
 	return db
 }
 
-func main() {
+func init() {
 	config.InitEnvVar()
 	config.InitLogger()
+}
 
+func main() {
 	db := getConn()
 	defer db.Close()
 
@@ -53,8 +56,8 @@ func main() {
 		switch strings.ToLower(args[0]) {
 		case "create":
 			if len(args) < 2 {
-				config.AppLogger.Warn("migration filename is not provided")
-				config.AppLogger.Warn("usage: migrate create \"migration name\"")
+				logger.Warn("migration filename is not provided")
+				logger.Warn("usage: migrate create \"migration name\"")
 				return
 			}
 
@@ -65,18 +68,18 @@ func main() {
 			downMigrationFilePath := fmt.Sprintf("%s/%d_%s.down.sql", migrationFilePath, timeStamp, filename)
 
 			if err := createFile(upMigrationFilePath); err != nil {
-				config.AppLogger.Fatal("error create migration up file")
+				logger.Fatal("error create migration up file")
 			}
 
 			if err := createFile(downMigrationFilePath); err != nil {
 				_ = os.Remove(upMigrationFilePath)
-				config.AppLogger.Fatal("error create migration down file")
+				logger.Fatal("error create migration down file")
 			}
 
 		case "up":
 			files, err := ioutil.ReadDir(migrationFilePath)
 			if err != nil {
-				config.AppLogger.Fatal("cannot read migration dir. Err: ", err.Error())
+				logger.Fatal("cannot read migration dir. Err: ", err.Error())
 			}
 
 			fileMap := make(map[string]string)
@@ -98,26 +101,26 @@ func main() {
 			var migrationSchema string
 			err = db.Raw("SELECT name FROM sqlite_master WHERE type='table' AND name=$1", migrationSchemaTable).Row().Scan(&migrationSchema)
 			if err != nil && err != sql.ErrNoRows {
-				config.AppLogger.Fatal("fail to check migration_schema table is exist or not. Err: ", err.Error())
+				logger.Fatal("fail to check migration_schema table is exist or not. Err: ", err.Error())
 			}
 
 			if migrationSchema == "" {
-				config.AppLogger.Info("table migration_schema is missing, creating...")
+				logger.Info("table migration_schema is missing, creating...")
 				err = db.Exec(fmt.Sprintf("CREATE TABLE %s (schema VARCHAR NOT NULL)", migrationSchemaTable)).Error
 				if err != nil {
-					config.AppLogger.Fatal("cannot create migration_schema table. Err: ", err.Error())
+					logger.Fatal("cannot create migration_schema table. Err: ", err.Error())
 				}
 
 				err = db.Exec(fmt.Sprintf("INSERT INTO %s (schema) VALUES ('')", migrationSchemaTable)).Error
 				if err != nil {
-					config.AppLogger.Fatal("cannot insert to migration_schema table. Err: ", err.Error())
+					logger.Fatal("cannot insert to migration_schema table. Err: ", err.Error())
 				}
 			}
 
 			var latestMigration string
 			err = db.Raw(fmt.Sprintf("SELECT schema FROM %s LIMIT 1", migrationSchemaTable)).Row().Scan(&latestMigration)
 			if err != nil && err != sql.ErrNoRows {
-				config.AppLogger.Fatal("fail to check latest migration in migration_schema table. Err: ", err.Error())
+				logger.Fatal("fail to check latest migration in migration_schema table. Err: ", err.Error())
 			}
 
 			runMigration := false
@@ -130,7 +133,7 @@ func main() {
 				if runMigration {
 					err = runMigrationFile(migrationVer, fmt.Sprintf("%s/%s", migrationFilePath, fileMap[migrationVer]))
 					if err != nil {
-						config.AppLogger.Fatal("fail to run migration, Err: ", err.Error())
+						logger.Fatal("fail to run migration, Err: ", err.Error())
 					}
 				}
 
@@ -139,10 +142,10 @@ func main() {
 				}
 			}
 
-			config.AppLogger.Info("Done!")
+			logger.Info("Done!")
 		}
 	} else {
-		config.AppLogger.Warn("usage: migrate [create] [up] [down]")
+		logger.Warn("usage: migrate [create] [up] [down]")
 	}
 }
 
@@ -173,7 +176,7 @@ func runMigrationFile(ver, filepath string) error {
 	tx := db.Begin()
 	var err error
 
-	config.AppLogger.Info("running migration ver: ", ver)
+	logger.Info("running migration ver: ", ver)
 
 	defer func() {
 		if p := recover(); p != nil {
@@ -187,7 +190,7 @@ func runMigrationFile(ver, filepath string) error {
 			// all good, commit
 			err = tx.Commit().Error
 			if err != nil {
-				config.AppLogger.Error("fail to commit transaction. Err: ", err.Error())
+				logger.Error("fail to commit transaction. Err: ", err.Error())
 				tx.Rollback()
 			}
 		}
@@ -195,18 +198,18 @@ func runMigrationFile(ver, filepath string) error {
 
 	sqlQuery, err := ioutil.ReadFile(filepath)
 	if err != nil {
-		config.AppLogger.Error("file reading error, Err: ", err.Error())
+		logger.Error("file reading error, Err: ", err.Error())
 		return err
 	}
 
 	if err = tx.Exec(string(sqlQuery)).Error; err != nil {
-		config.AppLogger.Error("error running query. Err: ", err.Error())
+		logger.Error("error running query. Err: ", err.Error())
 		return err
 	}
 
 	// update latest version to schema
 	if err = tx.Exec(fmt.Sprintf("UPDATE %s SET schema = ?", migrationSchemaTable), ver).Error; err != nil {
-		config.AppLogger.Error("error running query. Err: ", err.Error())
+		logger.Error("error running query. Err: ", err.Error())
 		return err
 	}
 

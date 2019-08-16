@@ -5,14 +5,18 @@ package main
 import (
 	"github.com/ramabmtr/inventario/api"
 	"github.com/ramabmtr/inventario/config"
+	"github.com/ramabmtr/inventario/logger"
 )
 
-func main() {
+func init() {
 	config.InitEnvVar()
 	config.InitLogger()
+}
+
+func main() {
 	db, err := config.InitDatabaseClient()
 	if err != nil {
-		config.AppLogger.WithError(err).Fatal("fail to initialize database connection")
+		logger.WithError(err).Fatal("fail to initialize database connection")
 	}
 	defer db.Close()
 

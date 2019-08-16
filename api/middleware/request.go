@@ -8,6 +8,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/ramabmtr/inventario/config"
+	"github.com/ramabmtr/inventario/logger"
 )
 
 func RequestLogger() echo.MiddlewareFunc {
@@ -17,7 +18,7 @@ func RequestLogger() echo.MiddlewareFunc {
 			req := c.Request()
 			res := c.Response()
 
-			config.AppLogger.Info(fmt.Sprintf("Request started: %s %s", req.Method, req.URL))
+			logger.Info(fmt.Sprintf("Request started: %s %s", req.Method, req.URL))
 
 			if config.Env.App.Debug {
 				var bodyBytes []byte
@@ -36,7 +37,7 @@ func RequestLogger() echo.MiddlewareFunc {
 
 				bodyBytes, _ = json.Marshal(body)
 
-				config.AppLogger.
+				logger.
 					WithField("headers", req.Header).
 					WithField("req_body", string(bodyBytes)).
 					Debug("Request detail")
@@ -44,7 +45,7 @@ func RequestLogger() echo.MiddlewareFunc {
 
 			err = next(c)
 
-			config.AppLogger.
+			logger.
 				WithField("status", res.Status).
 				Info(fmt.Sprintf("Request finished: %s %s", req.Method, req.URL))
 

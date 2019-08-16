@@ -9,6 +9,7 @@ import (
 	"github.com/ramabmtr/inventario/config"
 	"github.com/ramabmtr/inventario/domain"
 	"github.com/ramabmtr/inventario/helper"
+	"github.com/ramabmtr/inventario/logger"
 	"github.com/ramabmtr/inventario/repository/database/sqlite"
 	"github.com/ramabmtr/inventario/service"
 )
@@ -31,17 +32,17 @@ func UpdateInventory(c echo.Context) error {
 	inventoryID := c.Param("inventoryID")
 	if inventoryID == "" {
 		err := errors.New("inventory id is empty")
-		config.AppLogger.Error(err.Error())
+		logger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
 	param := new(updateInventoryRequestParam)
 	if err := c.Bind(param); err != nil {
-		config.AppLogger.WithField("validate", err.Error()).Warn("fail to bind request param")
+		logger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 	if err := c.Validate(param); err != nil {
-		config.AppLogger.WithField("validate", err.Error()).Warn("request param did not pas the validation")
+		logger.WithField("validate", err.Error()).Warn("request param did not pas the validation")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
@@ -59,7 +60,7 @@ func UpdateInventory(c echo.Context) error {
 			// all good, commit
 			err = tx.Commit().Error
 			if err != nil {
-				config.AppLogger.WithError(err).Error("fail to commit transaction")
+				logger.WithError(err).Error("fail to commit transaction")
 				tx.Rollback()
 			}
 		}
@@ -80,7 +81,7 @@ func UpdateInventory(c echo.Context) error {
 
 	err = inventorySvc.UpdateInventory(&i)
 	if err != nil {
-		config.AppLogger.WithError(err).Error("fail to process update inventory")
+		logger.WithError(err).Error("fail to process update inventory")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
@@ -93,24 +94,24 @@ func UpdateVariant(c echo.Context) error {
 	inventoryID := c.Param("inventoryID")
 	if inventoryID == "" {
 		err := errors.New("inventory id is empty")
-		config.AppLogger.Error(err.Error())
+		logger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
 	variantSKU := c.Param("variantSKU")
 	if variantSKU == "" {
 		err := errors.New("variant id is empty")
-		config.AppLogger.Error(err.Error())
+		logger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
 	param := new(updateInventoryVariantRequestParam)
 	if err := c.Bind(param); err != nil {
-		config.AppLogger.WithField("validate", err.Error()).Warn("fail to bind request param")
+		logger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 	if err := c.Validate(param); err != nil {
-		config.AppLogger.WithField("validate", err.Error()).Warn("request param did not pas the validation")
+		logger.WithField("validate", err.Error()).Warn("request param did not pas the validation")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
@@ -128,7 +129,7 @@ func UpdateVariant(c echo.Context) error {
 			// all good, commit
 			err = tx.Commit().Error
 			if err != nil {
-				config.AppLogger.WithError(err).Error("fail to commit transaction")
+				logger.WithError(err).Error("fail to commit transaction")
 				tx.Rollback()
 			}
 		}
@@ -152,7 +153,7 @@ func UpdateVariant(c echo.Context) error {
 
 	err = inventorySvc.UpdateInventoryVariant(&variant)
 	if err != nil {
-		config.AppLogger.WithError(err).Error("fail to process update inventory")
+		logger.WithError(err).Error("fail to process update inventory")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 

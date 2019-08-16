@@ -1,4 +1,4 @@
-package domain
+package logger
 
 type (
 	// By implementing all interface below, you can control how your log works
@@ -8,7 +8,7 @@ type (
 	// different func (e.g: don't have `Debug` feature)
 	// But if you implement all interface below in your logger, you don't need
 	// to change how you write your log in your code.
-	// In `./config/logger.go`, I have implement 2 logger, `logrus` and `stdLib log`
+	// In `./logger`, I have implement 2 logger, `logrus` and `stdLib log`
 	// and you can choose which log engine do you want to use by overriding
 	// `APP_LOG_ENGINE` env var
 	AppLoggerInterface interface {
@@ -24,3 +24,51 @@ type (
 		Fatal(args ...interface{})
 	}
 )
+
+const (
+	FatalLevel int = iota
+	ErrorLevel
+	WarnLevel
+	InfoLevel
+	DebugLevel
+)
+
+var (
+	appLogger = NewStdLogger()
+)
+
+func SetLogger(l AppLoggerInterface) {
+	appLogger = l
+}
+
+func SetLevel(l int) {
+	appLogger.SetLevel(l)
+}
+
+func WithField(key string, value interface{}) AppLoggerInterface {
+	return appLogger.WithField(key, value)
+}
+
+func WithError(err error) AppLoggerInterface {
+	return appLogger.WithError(err)
+}
+
+func Debug(args ...interface{}) {
+	appLogger.Debug(args...)
+}
+
+func Info(args ...interface{}) {
+	appLogger.Info(args...)
+}
+
+func Warn(args ...interface{}) {
+	appLogger.Warn(args...)
+}
+
+func Error(args ...interface{}) {
+	appLogger.Error(args...)
+}
+
+func Fatal(args ...interface{}) {
+	appLogger.Fatal(args...)
+}

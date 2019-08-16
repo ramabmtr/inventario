@@ -11,6 +11,7 @@ import (
 	AppMiddleware "github.com/ramabmtr/inventario/api/middleware"
 	"github.com/ramabmtr/inventario/config"
 	"github.com/ramabmtr/inventario/helper"
+	"github.com/ramabmtr/inventario/logger"
 )
 
 type (
@@ -50,13 +51,13 @@ func Run() {
 
 	e.Server.Addr = config.Env.App.Address
 
-	config.AppLogger.Info("API running on address ", config.Env.App.Address)
+	logger.Info("API running on address ", config.Env.App.Address)
 
 	err := gracehttp.Serve(e.Server)
 	if err != nil {
-		config.AppLogger.WithError(err).Fatal("Fail to initialize api...")
+		logger.WithError(err).Fatal("Fail to initialize api...")
 		return
 	}
 
-	config.AppLogger.Info("Server gracefully stopped... BYE")
+	logger.Info("Server gracefully stopped... BYE")
 }

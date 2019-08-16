@@ -23,6 +23,7 @@ func NewOrderRepository(db *gorm.DB) domain.OrderIFace {
 
 func (c *orderRepository) GetList(order domain.Order, startDate, endDate *time.Time) (orders []domain.Order, err error) {
 	err = c.db.Where(order).
+		Preload("Transactions").
 		Where("created_at >= ?", startDate).
 		Where("created_at <= ?", endDate).
 		Order("created_at DESC").

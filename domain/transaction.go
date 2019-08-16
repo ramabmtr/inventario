@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	jsoniter "github.com/json-iterator/go"
+	"github.com/ramabmtr/inventario/config"
+	"time"
+)
 
 type (
 	Transaction struct {
@@ -20,3 +24,16 @@ type (
 		Create(transaction *Transaction) (err error)
 	}
 )
+
+func (c Transaction) MarshalJSON() ([]byte, error) {
+	type Alias Transaction
+	return jsoniter.Marshal(&struct {
+		Alias
+		CreatedAt string `json:"created_at"`
+		UpdatedAt string `json:"updated_at"`
+	}{
+		Alias:     (Alias)(c),
+		CreatedAt: c.CreatedAt.Format(config.ISO8601Format),
+		UpdatedAt: c.UpdatedAt.Format(config.ISO8601Format),
+	})
+}

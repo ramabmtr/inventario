@@ -10,6 +10,7 @@ import (
 	"github.com/ramabmtr/inventario/config"
 	"github.com/ramabmtr/inventario/domain"
 	"github.com/ramabmtr/inventario/helper"
+	"github.com/ramabmtr/inventario/logger"
 	"github.com/ramabmtr/inventario/repository/database/sqlite"
 	"github.com/ramabmtr/inventario/service"
 )
@@ -33,11 +34,11 @@ func CreateInventory(c echo.Context) error {
 
 	param := new(createInventoryRequestParam)
 	if err = c.Bind(param); err != nil {
-		config.AppLogger.WithField("validate", err.Error()).Warn("fail to bind request param")
+		logger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 	if err = c.Validate(param); err != nil {
-		config.AppLogger.WithField("validate", err.Error()).Warn("request param did not pas the validation")
+		logger.WithField("validate", err.Error()).Warn("request param did not pas the validation")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
@@ -55,7 +56,7 @@ func CreateInventory(c echo.Context) error {
 			// all good, commit
 			err = tx.Commit().Error
 			if err != nil {
-				config.AppLogger.WithError(err).Error("fail to commit transaction")
+				logger.WithError(err).Error("fail to commit transaction")
 				tx.Rollback()
 			}
 		}
@@ -94,7 +95,7 @@ func CreateInventory(c echo.Context) error {
 
 	err = inventorySvc.CreateInventory(&i)
 	if err != nil {
-		config.AppLogger.WithError(err).Error("fail to process create inventory")
+		logger.WithError(err).Error("fail to process create inventory")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
@@ -107,17 +108,17 @@ func CreateVariant(c echo.Context) error {
 	inventoryID := c.Param("inventoryID")
 	if inventoryID == "" {
 		err := errors.New("inventory id is empty")
-		config.AppLogger.Error(err.Error())
+		logger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
 	param := new(createVariantRequestParam)
 	if err = c.Bind(param); err != nil {
-		config.AppLogger.WithField("validate", err.Error()).Warn("fail to bind request param")
+		logger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 	if err = c.Validate(param); err != nil {
-		config.AppLogger.WithField("validate", err.Error()).Warn("request param did not pas the validation")
+		logger.WithField("validate", err.Error()).Warn("request param did not pas the validation")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
 
@@ -135,7 +136,7 @@ func CreateVariant(c echo.Context) error {
 			// all good, commit
 			err = tx.Commit().Error
 			if err != nil {
-				config.AppLogger.WithError(err).Error("fail to commit transaction")
+				logger.WithError(err).Error("fail to commit transaction")
 				tx.Rollback()
 			}
 		}
@@ -156,7 +157,7 @@ func CreateVariant(c echo.Context) error {
 
 	err = inventorySvc.CreateInventoryVariant(&variant)
 	if err != nil {
-		config.AppLogger.WithError(err).Error("fail to process create inventory")
+		logger.WithError(err).Error("fail to process create inventory")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
