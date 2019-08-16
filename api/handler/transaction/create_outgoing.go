@@ -57,8 +57,9 @@ func CreateOutgoingTransaction(c echo.Context) error {
 	}()
 
 	trxRepo := sqlite.NewTransactionRepository(tx)
+	variantRepo := sqlite.NewVariantRepository(tx)
 
-	trxSvc := service.NewTransactionService(trxRepo)
+	trxSvc := service.NewTransactionService(trxRepo, variantRepo)
 
 	now := time.Now().UTC()
 

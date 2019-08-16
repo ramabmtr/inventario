@@ -82,8 +82,9 @@ func CreateIncomingTransaction(c echo.Context) error {
 	}
 
 	trxRepo := sqlite.NewTransactionRepository(tx)
+	variantRepo := sqlite.NewVariantRepository(tx)
 
-	trxSvc := service.NewTransactionService(trxRepo)
+	trxSvc := service.NewTransactionService(trxRepo, variantRepo)
 
 	now := time.Now().UTC()
 
@@ -108,10 +109,10 @@ func CreateIncomingTransaction(c echo.Context) error {
 		UpdatedAt:  &now,
 	}
 
-	err = trxSvc.CreateTransaction(&trx)
+	code, err := trxSvc.CreateIncomingTransaction(&trx, &order)
 	if err != nil {
 		logger.WithError(err).Error("fail to process create transaction")
-		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
+		return c.JSON(code, helper.ErrorResponse(err.Error()))
 	}
 
 	return c.JSON(http.StatusOK, helper.ObjectResponse(trx, "transaction"))

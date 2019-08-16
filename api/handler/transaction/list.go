@@ -44,8 +44,9 @@ func GetTransactionList(c echo.Context) error {
 	db := config.GetDatabaseClient()
 
 	trxRepo := sqlite.NewTransactionRepository(db)
+	variantRepo := sqlite.NewVariantRepository(db)
 
-	trxSvc := service.NewTransactionService(trxRepo)
+	trxSvc := service.NewTransactionService(trxRepo, variantRepo)
 
 	trx := domain.Transaction{}
 

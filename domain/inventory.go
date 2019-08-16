@@ -43,7 +43,7 @@ type (
 		GetList(inventoryID string, limit, offset int) (variants []InventoryVariant, err error)
 		GetDetail(inventory *InventoryVariant, fetchParent bool) (err error)
 		Create(variant *InventoryVariant) (err error)
-		Update(variant *InventoryVariant) (err error)
+		Update(sku string, variant *InventoryVariant) (err error)
 	}
 )
 

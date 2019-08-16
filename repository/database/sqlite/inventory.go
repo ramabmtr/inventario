@@ -93,6 +93,10 @@ func (c *variantRepository) Create(variant *domain.InventoryVariant) (err error)
 	return c.db.Create(variant).Error
 }
 
-func (c *variantRepository) Update(variant *domain.InventoryVariant) (err error) {
-	return
+func (c *variantRepository) Update(sku string, variant *domain.InventoryVariant) (err error) {
+	v := domain.InventoryVariant{
+		SKU: sku,
+	}
+
+	return c.db.Model(v).Where(v).Update(variant).Error
 }

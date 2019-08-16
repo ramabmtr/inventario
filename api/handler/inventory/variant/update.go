@@ -77,7 +77,6 @@ func UpdateVariant(c echo.Context) error {
 	now := time.Now().UTC()
 
 	variant := domain.InventoryVariant{
-		SKU:         variantSKU,
 		InventoryID: inventoryID,
 		Name:        param.Name,
 		Color:       param.Color,
@@ -85,7 +84,7 @@ func UpdateVariant(c echo.Context) error {
 		UpdatedAt:   &now,
 	}
 
-	err = inventorySvc.UpdateInventoryVariant(&variant)
+	err = inventorySvc.UpdateInventoryVariant(variantSKU, &variant)
 	if err != nil {
 		logger.WithError(err).Error("fail to process update inventory")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))

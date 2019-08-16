@@ -60,8 +60,8 @@ func (c *inventoryService) CreateInventoryVariant(variant *domain.InventoryVaria
 	return c.variant.Create(variant)
 }
 
-func (c *inventoryService) UpdateInventoryVariant(variant *domain.InventoryVariant) (err error) {
+func (c *inventoryService) UpdateInventoryVariant(sku string, variant *domain.InventoryVariant) (err error) {
 	now := time.Now().UTC()
 	variant.UpdatedAt = &now
-	return c.variant.Update(variant)
+	return c.variant.Update(sku, variant)
 }
