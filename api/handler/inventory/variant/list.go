@@ -1,20 +1,30 @@
-package inventory
+package variant
 
 import (
 	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo"
 	"github.com/ramabmtr/inventario/config"
-	"github.com/ramabmtr/inventario/domain"
 	"github.com/ramabmtr/inventario/helper"
 	"github.com/ramabmtr/inventario/logger"
 	"github.com/ramabmtr/inventario/repository/database/sqlite"
 	"github.com/ramabmtr/inventario/service"
 )
 
-func GetInventoryDetail(c echo.Context) error {
+func GetVariantList(c echo.Context) error {
 	var err error
+
+	limit, err := strconv.Atoi(c.QueryParam("limit"))
+	if err != nil {
+		limit = config.DefaultLimit
+	}
+
+	offset, err := strconv.Atoi(c.QueryParam("offset"))
+	if err != nil {
+		offset = config.DefaultOffset
+	}
 
 	inventoryID := c.Param("inventoryID")
 	if inventoryID == "" {
@@ -30,19 +40,11 @@ func GetInventoryDetail(c echo.Context) error {
 
 	inventorySvc := service.NewInventoryService(inventoryRepo, variantRepo)
 
-	i := domain.Inventory{
-		ID: inventoryID,
-	}
-
-	err = inventorySvc.GetInventoryDetail(&i)
-	if err == config.ErrNotFound {
-		logger.WithError(err).Error("inventory not found")
-		return c.JSON(http.StatusNotFound, helper.FailResponse(err.Error()))
-	}
+	variants, err := inventorySvc.GetVariantList(inventoryID, limit, offset)
 	if err != nil {
-		logger.WithError(err).Error("fail to process get inventory detail")
+		logger.WithError(err).Error("fail to process get variant list")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(i, "inventory"))
+	return c.JSON(http.StatusCreated, helper.ObjectResponse(variants, "variants"))
 }

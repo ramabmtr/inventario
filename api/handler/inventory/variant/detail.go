@@ -1,4 +1,4 @@
-package inventory
+package variant
 
 import (
 	"errors"
@@ -13,12 +13,19 @@ import (
 	"github.com/ramabmtr/inventario/service"
 )
 
-func GetInventoryDetail(c echo.Context) error {
+func GetVariantDetail(c echo.Context) error {
 	var err error
 
 	inventoryID := c.Param("inventoryID")
 	if inventoryID == "" {
-		err := errors.New("inventory id is empty")
+		err = errors.New("inventory id is empty")
+		logger.Error(err.Error())
+		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
+	}
+
+	variantSKU := c.Param("variantSKU")
+	if variantSKU == "" {
+		err = errors.New("variant sku is empty")
 		logger.Error(err.Error())
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
 	}
@@ -30,19 +37,20 @@ func GetInventoryDetail(c echo.Context) error {
 
 	inventorySvc := service.NewInventoryService(inventoryRepo, variantRepo)
 
-	i := domain.Inventory{
-		ID: inventoryID,
+	variant := domain.InventoryVariant{
+		SKU:         variantSKU,
+		InventoryID: inventoryID,
 	}
 
-	err = inventorySvc.GetInventoryDetail(&i)
+	err = inventorySvc.GetInventoryVariantDetail(&variant)
 	if err == config.ErrNotFound {
-		logger.WithError(err).Error("inventory not found")
+		logger.WithError(err).Error("variant not found")
 		return c.JSON(http.StatusNotFound, helper.FailResponse(err.Error()))
 	}
 	if err != nil {
-		logger.WithError(err).Error("fail to process get inventory detail")
+		logger.WithError(err).Error("fail to process get variant detail")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(i, "inventory"))
+	return c.JSON(http.StatusCreated, helper.ObjectResponse(variant, "variant"))
 }

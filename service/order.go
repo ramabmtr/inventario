@@ -18,6 +18,10 @@ func NewOrderService(order domain.OrderIFace) *orderService {
 	}
 }
 
+func (c *orderService) GetOrderDetail(order *domain.Order) (err error) {
+	return c.order.GetDetail(order)
+}
+
 func (c *orderService) GetOrderList(order domain.Order, startDate, endDate *time.Time) (orders []domain.Order, err error) {
 	return c.order.GetList(order, startDate, endDate)
 }

@@ -20,6 +20,7 @@ type (
 	}
 
 	OrderIFace interface {
+		GetDetail(order *Order) (err error)
 		GetList(order Order, startDate, endDate *time.Time) (orders []Order, err error)
 		Create(order *Order) (err error)
 	}

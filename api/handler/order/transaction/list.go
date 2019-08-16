@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -15,6 +16,13 @@ import (
 
 func GetTransactionList(c echo.Context) error {
 	var err error
+
+	orderID := c.Param("orderID")
+	if orderID == "" {
+		err = errors.New("order id is empty")
+		logger.Error(err.Error())
+		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
+	}
 
 	startDateQuery := c.QueryParam("start_date")
 	if startDateQuery == "" {
@@ -47,7 +55,9 @@ func GetTransactionList(c echo.Context) error {
 
 	trxSvc := service.NewTransactionService(trxRepo)
 
-	trx := domain.Transaction{}
+	trx := domain.Transaction{
+		OrderID: orderID,
+	}
 
 	trxs, err := trxSvc.GetTransactionList(trx, &startDate, &endDate)
 	if err != nil {

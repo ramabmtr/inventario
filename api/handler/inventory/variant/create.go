@@ -1,10 +1,9 @@
-package order
+package variant
 
 import (
+	"errors"
 	"net/http"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/labstack/echo"
 	"github.com/ramabmtr/inventario/config"
 	"github.com/ramabmtr/inventario/domain"
@@ -15,19 +14,25 @@ import (
 )
 
 type (
-	createOrderRequestParam struct {
-		ID         string  `json:"id"`
-		VariantSKU string  `json:"variant_sku" validate:"required"`
-		Quantity   int     `json:"quantity" validate:"required"`
-		Price      float64 `json:"price" validate:"required"`
-		Receipt    string  `json:"receipt"`
+	CreateVariantRequestParam struct {
+		SKU   string `json:"sku" validate:"required"`
+		Name  string `json:"name" validate:"required_without=Size Color"`
+		Size  string `json:"size" validate:"required_without=Name Color"`
+		Color string `json:"color" validate:"required_without=Name Size"`
 	}
 )
 
-func CreateOrder(c echo.Context) error {
+func CreateVariant(c echo.Context) error {
 	var err error
 
-	param := new(createOrderRequestParam)
+	inventoryID := c.Param("inventoryID")
+	if inventoryID == "" {
+		err := errors.New("inventory id is empty")
+		logger.Error(err.Error())
+		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
+	}
+
+	param := new(CreateVariantRequestParam)
 	if err = c.Bind(param); err != nil {
 		logger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
@@ -57,32 +62,24 @@ func CreateOrder(c echo.Context) error {
 		}
 	}()
 
-	orderRepo := sqlite.NewOrderRepository(tx)
+	inventoryRepo := sqlite.NewInventoryRepository(tx)
+	variantRepo := sqlite.NewVariantRepository(tx)
 
-	orderSvc := service.NewOrderService(orderRepo)
+	inventorySvc := service.NewInventoryService(inventoryRepo, variantRepo)
 
-	orderID := param.ID
-	if orderID == "" {
-		orderID = uuid.New().String()
+	variant := domain.InventoryVariant{
+		SKU:         param.SKU,
+		InventoryID: inventoryID,
+		Name:        param.Name,
+		Size:        param.Size,
+		Color:       param.Color,
 	}
 
-	now := time.Now().UTC()
-
-	order := domain.Order{
-		ID:         orderID,
-		VariantSKU: param.VariantSKU,
-		Quantity:   param.Quantity,
-		Price:      param.Price,
-		Receipt:    param.Receipt,
-		CreatedAt:  &now,
-		UpdatedAt:  &now,
-	}
-
-	err = orderSvc.CreateOrder(&order)
+	err = inventorySvc.CreateInventoryVariant(&variant)
 	if err != nil {
-		logger.WithError(err).Error("fail to process create order")
+		logger.WithError(err).Error("fail to process create inventory")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(order, "order"))
+	return c.JSON(http.StatusCreated, helper.ObjectResponse(variant, "variant"))
 }

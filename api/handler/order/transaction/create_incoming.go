@@ -1,6 +1,7 @@
-package order
+package transaction
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -15,19 +16,24 @@ import (
 )
 
 type (
-	createOrderRequestParam struct {
-		ID         string  `json:"id"`
-		VariantSKU string  `json:"variant_sku" validate:"required"`
-		Quantity   int     `json:"quantity" validate:"required"`
-		Price      float64 `json:"price" validate:"required"`
-		Receipt    string  `json:"receipt"`
+	createTransactionRequestParam struct {
+		ID       string  `json:"id"`
+		Quantity int     `json:"quantity" validate:"required"`
+		Price    float64 `json:"price"`
 	}
 )
 
-func CreateOrder(c echo.Context) error {
+func CreateIncomingTransaction(c echo.Context) error {
 	var err error
 
-	param := new(createOrderRequestParam)
+	orderID := c.Param("orderID")
+	if orderID == "" {
+		err = errors.New("order id is empty")
+		logger.Error(err.Error())
+		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
+	}
+
+	param := new(createTransactionRequestParam)
 	if err = c.Bind(param); err != nil {
 		logger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
@@ -61,28 +67,52 @@ func CreateOrder(c echo.Context) error {
 
 	orderSvc := service.NewOrderService(orderRepo)
 
-	orderID := param.ID
-	if orderID == "" {
-		orderID = uuid.New().String()
+	order := domain.Order{
+		ID: orderID,
 	}
+
+	err = orderSvc.GetOrderDetail(&order)
+	if err == config.ErrNotFound {
+		logger.WithError(err).Error("order not found")
+		c.JSON(http.StatusNotFound, helper.FailResponse(err.Error()))
+	}
+	if err != nil {
+		logger.WithError(err).Error("fail to process get order detail")
+		c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
+	}
+
+	trxRepo := sqlite.NewTransactionRepository(tx)
+
+	trxSvc := service.NewTransactionService(trxRepo)
 
 	now := time.Now().UTC()
 
-	order := domain.Order{
-		ID:         orderID,
-		VariantSKU: param.VariantSKU,
+	trxID := param.ID
+	if trxID == "" {
+		trxID = uuid.New().String()
+	}
+
+	price := order.Price
+	if param.Price != 0 {
+		price = param.Price
+	}
+
+	trx := domain.Transaction{
+		ID:         trxID,
+		VariantSKU: order.VariantSKU,
+		Type:       config.IncomingTransactionType,
+		OrderID:    orderID,
 		Quantity:   param.Quantity,
-		Price:      param.Price,
-		Receipt:    param.Receipt,
+		Price:      price,
 		CreatedAt:  &now,
 		UpdatedAt:  &now,
 	}
 
-	err = orderSvc.CreateOrder(&order)
+	err = trxSvc.CreateTransaction(&trx)
 	if err != nil {
-		logger.WithError(err).Error("fail to process create order")
+		logger.WithError(err).Error("fail to process create transaction")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(order, "order"))
+	return c.JSON(http.StatusOK, helper.ObjectResponse(trx, "transaction"))
 }

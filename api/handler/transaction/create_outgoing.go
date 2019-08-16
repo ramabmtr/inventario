@@ -1,4 +1,4 @@
-package order
+package transaction
 
 import (
 	"net/http"
@@ -15,19 +15,18 @@ import (
 )
 
 type (
-	createOrderRequestParam struct {
+	createTransactionRequestParam struct {
 		ID         string  `json:"id"`
 		VariantSKU string  `json:"variant_sku" validate:"required"`
 		Quantity   int     `json:"quantity" validate:"required"`
 		Price      float64 `json:"price" validate:"required"`
-		Receipt    string  `json:"receipt"`
 	}
 )
 
-func CreateOrder(c echo.Context) error {
+func CreateOutgoingTransaction(c echo.Context) error {
 	var err error
 
-	param := new(createOrderRequestParam)
+	param := new(createTransactionRequestParam)
 	if err = c.Bind(param); err != nil {
 		logger.WithField("validate", err.Error()).Warn("fail to bind request param")
 		return c.JSON(http.StatusBadRequest, helper.FailResponse(err.Error()))
@@ -57,32 +56,32 @@ func CreateOrder(c echo.Context) error {
 		}
 	}()
 
-	orderRepo := sqlite.NewOrderRepository(tx)
+	trxRepo := sqlite.NewTransactionRepository(tx)
 
-	orderSvc := service.NewOrderService(orderRepo)
-
-	orderID := param.ID
-	if orderID == "" {
-		orderID = uuid.New().String()
-	}
+	trxSvc := service.NewTransactionService(trxRepo)
 
 	now := time.Now().UTC()
 
-	order := domain.Order{
-		ID:         orderID,
+	trxID := param.ID
+	if trxID == "" {
+		trxID = uuid.New().String()
+	}
+
+	trx := domain.Transaction{
+		ID:         trxID,
 		VariantSKU: param.VariantSKU,
+		Type:       config.OutgoingTransactionType,
 		Quantity:   param.Quantity,
 		Price:      param.Price,
-		Receipt:    param.Receipt,
 		CreatedAt:  &now,
 		UpdatedAt:  &now,
 	}
 
-	err = orderSvc.CreateOrder(&order)
+	err = trxSvc.CreateTransaction(&trx)
 	if err != nil {
-		logger.WithError(err).Error("fail to process create order")
+		logger.WithError(err).Error("fail to process create transaction")
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(order, "order"))
+	return c.JSON(http.StatusOK, helper.ObjectResponse(trx, "transaction"))
 }

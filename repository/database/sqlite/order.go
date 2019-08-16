@@ -3,6 +3,8 @@ package sqlite
 import (
 	"time"
 
+	"github.com/ramabmtr/inventario/helper"
+
 	"github.com/jinzhu/gorm"
 	"github.com/ramabmtr/inventario/domain"
 )
@@ -21,12 +23,20 @@ func NewOrderRepository(db *gorm.DB) domain.OrderIFace {
 	}
 }
 
-func (c *orderRepository) GetList(order domain.Order, startDate, endDate *time.Time) (orders []domain.Order, err error) {
+func (c *orderRepository) GetDetail(order *domain.Order) (err error) {
 	err = c.db.Where(order).
 		Preload("Transactions").
+		First(&order).Error
+
+	return helper.TranslateSqliteError(err)
+}
+
+func (c *orderRepository) GetList(order domain.Order, startDate, endDate *time.Time) (orders []domain.Order, err error) {
+	err = c.db.Where(order).
 		Where("created_at >= ?", startDate).
 		Where("created_at <= ?", endDate).
 		Order("created_at DESC").
+		Preload("Transactions").
 		Find(&orders).Error
 	return orders, err
 }
