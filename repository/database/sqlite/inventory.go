@@ -89,7 +89,9 @@ func (c *variantRepository) GetDetail(variant *domain.InventoryVariant, fetchInv
 }
 
 func (c *variantRepository) Create(variant *domain.InventoryVariant) (err error) {
-	return c.db.Create(variant).Error
+	return c.db.Set("gorm:association_autoupdate", false).
+		Set("gorm:association_autocreate", false).
+		Create(variant).Error
 }
 
 func (c *variantRepository) Update(sku string, variant *domain.InventoryVariant) (err error) {

@@ -11,6 +11,10 @@ type (
 	transactionRepository struct {
 		db *gorm.DB
 	}
+
+	transactionItemRepository struct {
+		db *gorm.DB
+	}
 )
 
 // NewOrderRepository implements domain.TransactionIFace
@@ -32,4 +36,16 @@ func (c *transactionRepository) GetList(trx domain.Transaction, startDate, endDa
 
 func (c *transactionRepository) Create(trx *domain.Transaction) (err error) {
 	return c.db.Create(trx).Error
+}
+
+func NewTransactionItemRepository(db *gorm.DB) domain.TransactionItemIFace {
+	return &transactionItemRepository{
+		db: db,
+	}
+}
+
+func (c *transactionItemRepository) Create(trxItem *domain.TransactionItem) (err error) {
+	return c.db.Set("gorm:association_autoupdate", false).
+		Set("gorm:association_autocreate", false).
+		Create(trxItem).Error
 }

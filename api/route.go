@@ -27,7 +27,6 @@ func PublicRouter(g *echo.Group) {
 	g.GET("/orders", order.GetOrderList)
 	g.POST("/orders", order.CreateOrder)
 	g.GET("/orders/:orderID", order.GetOrderDetail)
-	g.GET("/orders/:orderID/transactions", transactionOrder.GetTransactionList)
 	g.POST("/orders/:orderID/transactions", transactionOrder.CreateIncomingTransaction)
 
 	g.GET("/transactions", transaction.GetTransactionList)

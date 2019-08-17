@@ -58,8 +58,10 @@ func CreateOrder(c echo.Context) error {
 	}()
 
 	orderRepo := sqlite.NewOrderRepository(tx)
+	orderTrxRepo := sqlite.NewOrderTransactionRepository(tx)
+	variantRepo := sqlite.NewVariantRepository(tx)
 
-	orderSvc := service.NewOrderService(orderRepo)
+	orderSvc := service.NewOrderService(orderRepo, orderTrxRepo, variantRepo)
 
 	orderID := param.ID
 	if orderID == "" {

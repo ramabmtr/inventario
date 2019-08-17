@@ -3,14 +3,17 @@ package sqlite
 import (
 	"time"
 
-	"github.com/ramabmtr/inventario/helper"
-
 	"github.com/jinzhu/gorm"
 	"github.com/ramabmtr/inventario/domain"
+	"github.com/ramabmtr/inventario/helper"
 )
 
 type (
 	orderRepository struct {
+		db *gorm.DB
+	}
+
+	orderItemRepository struct {
 		db *gorm.DB
 	}
 )
@@ -55,4 +58,16 @@ func (c *orderRepository) Create(order *domain.Order) (err error) {
 	return c.db.Set("gorm:association_autoupdate", false).
 		Set("gorm:association_autocreate", false).
 		Create(order).Error
+}
+
+func NewOrderTransactionRepository(db *gorm.DB) domain.OrderTransactionIFace {
+	return &orderItemRepository{
+		db: db,
+	}
+}
+
+func (c *orderItemRepository) Create(orderTransaction *domain.OrderTransaction) (err error) {
+	return c.db.Set("gorm:association_autoupdate", false).
+		Set("gorm:association_autocreate", false).
+		Create(orderTransaction).Error
 }

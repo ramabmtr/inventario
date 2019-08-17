@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ramabmtr/inventario/config"
-
 	jsoniter "github.com/json-iterator/go"
 	"github.com/ramabmtr/inventario/domain"
 	"github.com/shopspring/decimal"
@@ -155,9 +153,7 @@ func (c *reportService) GetInventoryReportCSV(showEmptyStock bool) (res []byte, 
 }
 
 func (c *reportService) GetSalesReport(startDate, endDate *time.Time) (res *domain.SalesReport, err error) {
-	transaction := domain.Transaction{
-		Type: config.OutgoingTransactionType,
-	}
+	transaction := domain.Transaction{}
 
 	transactions, err := c.transaction.GetList(transaction, startDate, endDate)
 	if err != nil {
@@ -170,60 +166,62 @@ func (c *reportService) GetSalesReport(startDate, endDate *time.Time) (res *doma
 	var totalItemSold int
 
 	for _, trx := range transactions {
-		variant := domain.InventoryVariant{
-			SKU: trx.VariantSKU,
+		for _, item := range trx.Items {
+			variant := domain.InventoryVariant{
+				SKU: item.VariantSKU,
+			}
+			err = c.variant.GetDetail(&variant, true)
+			if err != nil {
+				return res, err
+			}
+
+			order := domain.Order{
+				VariantSKU: item.VariantSKU,
+			}
+
+			orders, err := c.order.GetAll(order, false)
+			if err != nil {
+				return res, err
+			}
+
+			totalOrderQuantity := decimal.NewFromFloat(0)
+			totalOrderPrice := decimal.NewFromFloat(0)
+
+			for _, o := range orders {
+				q := decimal.NewFromFloat(float64(o.Quantity))
+				p := decimal.NewFromFloat(o.Price)
+				tp := p.Mul(q)
+
+				totalOrderQuantity = totalOrderQuantity.Add(q)
+				totalOrderPrice = totalOrderPrice.Add(tp)
+			}
+
+			qty := decimal.NewFromFloat(float64(item.Quantity))
+			sellPrice := decimal.NewFromFloat(item.Price)
+			averageBuyPrice := totalOrderPrice.Div(totalOrderQuantity)
+			profit := sellPrice.Sub(averageBuyPrice).Mul(qty)
+			totalAmount := sellPrice.Mul(qty)
+
+			totalItemSold = totalItemSold + item.Quantity
+			totalSales = totalSales.Add(totalAmount)
+			totalGrossProfit = totalGrossProfit.Add(profit)
+
+			sList := domain.SalesListReport{
+				ID:          trx.ID,
+				CreatedAt:   trx.CreatedAt,
+				SKU:         item.VariantSKU,
+				Name:        variant.Inventory.Name,
+				Size:        variant.Size,
+				Color:       variant.Color,
+				Quantity:    item.Quantity,
+				SellPrice:   sellPrice.Ceil().IntPart(),
+				TotalAmount: totalAmount.Ceil().IntPart(),
+				BuyPrice:    averageBuyPrice.Ceil().IntPart(),
+				Profit:      profit.Ceil().IntPart(),
+			}
+
+			salesList = append(salesList, sList)
 		}
-		err = c.variant.GetDetail(&variant, true)
-		if err != nil {
-			return res, err
-		}
-
-		order := domain.Order{
-			VariantSKU: trx.VariantSKU,
-		}
-
-		orders, err := c.order.GetAll(order, false)
-		if err != nil {
-			return res, err
-		}
-
-		totalOrderQuantity := decimal.NewFromFloat(0)
-		totalOrderPrice := decimal.NewFromFloat(0)
-
-		for _, o := range orders {
-			q := decimal.NewFromFloat(float64(o.Quantity))
-			p := decimal.NewFromFloat(o.Price)
-			tp := p.Mul(q)
-
-			totalOrderQuantity = totalOrderQuantity.Add(q)
-			totalOrderPrice = totalOrderPrice.Add(tp)
-		}
-
-		qty := decimal.NewFromFloat(float64(trx.Quantity))
-		sellPrice := decimal.NewFromFloat(trx.Price)
-		averageBuyPrice := totalOrderPrice.Div(totalOrderQuantity)
-		profit := sellPrice.Sub(averageBuyPrice).Mul(qty)
-		totalAmount := sellPrice.Mul(qty)
-
-		totalItemSold = totalItemSold + trx.Quantity
-		totalSales = totalSales.Add(totalAmount)
-		totalGrossProfit = totalGrossProfit.Add(profit)
-
-		sList := domain.SalesListReport{
-			ID:          trx.ID,
-			CreatedAt:   trx.CreatedAt,
-			SKU:         trx.VariantSKU,
-			Name:        variant.Inventory.Name,
-			Size:        variant.Size,
-			Color:       variant.Color,
-			Quantity:    trx.Quantity,
-			SellPrice:   sellPrice.Ceil().IntPart(),
-			TotalAmount: totalAmount.Ceil().IntPart(),
-			BuyPrice:    averageBuyPrice.Ceil().IntPart(),
-			Profit:      profit.Ceil().IntPart(),
-		}
-
-		salesList = append(salesList, sList)
 	}
 
 	now := time.Now().UTC()

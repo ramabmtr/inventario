@@ -16,7 +16,11 @@ import (
 
 type (
 	createOutgoingTransactionRequestParam struct {
-		ID         string  `json:"id"`
+		ID    string                     `json:"id"`
+		Items []outgoingTransactionParam `json:"items" validate:"gt=0,dive,required"`
+	}
+
+	outgoingTransactionParam struct {
 		VariantSKU string  `json:"variant_sku" validate:"required"`
 		Quantity   int     `json:"quantity" validate:"required"`
 		Price      float64 `json:"price" validate:"required"`
@@ -57,9 +61,10 @@ func CreateOutgoingTransaction(c echo.Context) error {
 	}()
 
 	trxRepo := sqlite.NewTransactionRepository(tx)
+	trxItemRepo := sqlite.NewTransactionItemRepository(tx)
 	variantRepo := sqlite.NewVariantRepository(tx)
 
-	trxSvc := service.NewTransactionService(trxRepo, variantRepo)
+	trxSvc := service.NewTransactionService(trxRepo, trxItemRepo, variantRepo)
 
 	now := time.Now().UTC()
 
@@ -68,14 +73,25 @@ func CreateOutgoingTransaction(c echo.Context) error {
 		trxID = uuid.New().String()
 	}
 
+	var trxItems []domain.TransactionItem
+
+	for _, item := range param.Items {
+		trxItems = append(trxItems, domain.TransactionItem{
+			ID:            uuid.New().String(),
+			TransactionID: trxID,
+			VariantSKU:    item.VariantSKU,
+			Quantity:      item.Quantity,
+			Price:         item.Price,
+			CreatedAt:     &now,
+			UpdatedAt:     &now,
+		})
+	}
+
 	trx := domain.Transaction{
-		ID:         trxID,
-		VariantSKU: param.VariantSKU,
-		Type:       config.OutgoingTransactionType,
-		Quantity:   param.Quantity,
-		Price:      param.Price,
-		CreatedAt:  &now,
-		UpdatedAt:  &now,
+		ID:        trxID,
+		Items:     trxItems,
+		CreatedAt: &now,
+		UpdatedAt: &now,
 	}
 
 	code, err := trxSvc.CreateOutgoingTransaction(&trx)

@@ -26,8 +26,10 @@ func GetOrderDetail(c echo.Context) error {
 	db := config.GetDatabaseClient()
 
 	orderRepo := sqlite.NewOrderRepository(db)
+	orderTrxRepo := sqlite.NewOrderTransactionRepository(db)
+	variantRepo := sqlite.NewVariantRepository(db)
 
-	orderSvc := service.NewOrderService(orderRepo)
+	orderSvc := service.NewOrderService(orderRepo, orderTrxRepo, variantRepo)
 
 	order := domain.Order{
 		ID: orderID,

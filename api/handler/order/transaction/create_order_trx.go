@@ -63,8 +63,10 @@ func CreateIncomingTransaction(c echo.Context) error {
 	}()
 
 	orderRepo := sqlite.NewOrderRepository(tx)
+	orderTrxRepo := sqlite.NewOrderTransactionRepository(tx)
+	variantRepo := sqlite.NewVariantRepository(tx)
 
-	orderSvc := service.NewOrderService(orderRepo)
+	orderSvc := service.NewOrderService(orderRepo, orderTrxRepo, variantRepo)
 
 	order := domain.Order{
 		ID: orderID,
@@ -80,34 +82,21 @@ func CreateIncomingTransaction(c echo.Context) error {
 		c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	trxRepo := sqlite.NewTransactionRepository(tx)
-	variantRepo := sqlite.NewVariantRepository(tx)
-
-	trxSvc := service.NewTransactionService(trxRepo, variantRepo)
-
 	now := time.Now().UTC()
 
-	trxID := param.ID
-	if trxID == "" {
-		trxID = uuid.New().String()
+	orderTrx := domain.OrderTransaction{
+		ID:        uuid.New().String(),
+		OrderID:   orderID,
+		Quantity:  param.Quantity,
+		CreatedAt: &now,
+		UpdatedAt: &now,
 	}
 
-	trx := domain.Transaction{
-		ID:         trxID,
-		VariantSKU: order.VariantSKU,
-		Type:       config.IncomingTransactionType,
-		OrderID:    orderID,
-		Quantity:   param.Quantity,
-		Price:      order.Price,
-		CreatedAt:  &now,
-		UpdatedAt:  &now,
-	}
-
-	code, err := trxSvc.CreateIncomingTransaction(&trx, &order)
+	code, err := orderSvc.CreateOrderTransaction(&order, &orderTrx)
 	if err != nil {
 		logger.WithError(err).Error("fail to process create transaction")
 		return c.JSON(code, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(trx, "transaction"))
+	return c.JSON(http.StatusCreated, helper.ObjectResponse(orderTrx, "order_transaction"))
 }
