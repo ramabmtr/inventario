@@ -84,7 +84,8 @@ func (c *variantRepository) GetDetail(variant *domain.InventoryVariant, fetchInv
 	if fetchInventory {
 		q = q.Preload("Inventory")
 	}
-	return q.Where(variant).First(variant).Error
+	err = q.Where(variant).First(variant).Error
+	return helper.TranslateSqliteError(err)
 }
 
 func (c *variantRepository) Create(variant *domain.InventoryVariant) (err error) {

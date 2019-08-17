@@ -17,9 +17,8 @@ import (
 
 type (
 	createIncomingTransactionRequestParam struct {
-		ID       string  `json:"id"`
-		Quantity int     `json:"quantity" validate:"required"`
-		Price    float64 `json:"price"`
+		ID       string `json:"id"`
+		Quantity int    `json:"quantity" validate:"required"`
 	}
 )
 
@@ -93,18 +92,13 @@ func CreateIncomingTransaction(c echo.Context) error {
 		trxID = uuid.New().String()
 	}
 
-	price := order.Price
-	if param.Price != 0 {
-		price = param.Price
-	}
-
 	trx := domain.Transaction{
 		ID:         trxID,
 		VariantSKU: order.VariantSKU,
 		Type:       config.IncomingTransactionType,
 		OrderID:    orderID,
 		Quantity:   param.Quantity,
-		Price:      price,
+		Price:      order.Price,
 		CreatedAt:  &now,
 		UpdatedAt:  &now,
 	}
