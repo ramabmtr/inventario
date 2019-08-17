@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"github.com/ramabmtr/inventario/logger"
 	"net/http"
 	"time"
 
@@ -40,6 +41,7 @@ func (c *transactionService) CreateOutgoingTransaction(trx *domain.Transaction) 
 	}
 
 	for _, item := range trx.Items {
+		logger.Info(item)
 		variant := domain.InventoryVariant{
 			SKU: item.VariantSKU,
 		}
@@ -51,7 +53,7 @@ func (c *transactionService) CreateOutgoingTransaction(trx *domain.Transaction) 
 
 		currentQuantity := variant.Quantity
 		if item.Quantity > currentQuantity {
-			return http.StatusNotAcceptable, errors.New(fmt.Sprintf("quantity for this trx exceeded the limit. max quantity allowed: %v", currentQuantity))
+			return http.StatusNotAcceptable, errors.New(fmt.Sprintf("quantity for %s exceeded the limit. max quantity allowed: %v", item.VariantSKU, currentQuantity))
 		}
 
 		err = c.trxItem.Create(&item)

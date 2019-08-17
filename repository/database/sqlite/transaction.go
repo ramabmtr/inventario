@@ -27,6 +27,7 @@ func NewTransactionRepository(db *gorm.DB) domain.TransactionIFace {
 
 func (c *transactionRepository) GetList(trx domain.Transaction, startDate, endDate *time.Time) (transactions []domain.Transaction, err error) {
 	err = c.db.Where(trx).
+		Preload("Items").
 		Where("created_at >= ?", startDate).
 		Where("created_at <= ?", endDate).
 		Order("created_at DESC").
@@ -35,7 +36,9 @@ func (c *transactionRepository) GetList(trx domain.Transaction, startDate, endDa
 }
 
 func (c *transactionRepository) Create(trx *domain.Transaction) (err error) {
-	return c.db.Create(trx).Error
+	return c.db.Set("gorm:association_autoupdate", false).
+		Set("gorm:association_autocreate", false).
+		Create(trx).Error
 }
 
 func NewTransactionItemRepository(db *gorm.DB) domain.TransactionItemIFace {
