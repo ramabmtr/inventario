@@ -46,5 +46,5 @@ func GetVariantList(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(variants, "variants"))
+	return c.JSON(http.StatusOK, helper.ObjectResponse(variants, "variants"))
 }

@@ -44,5 +44,5 @@ func GetInventoryDetail(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusCreated, helper.ObjectResponse(i, "inventory"))
+	return c.JSON(http.StatusOK, helper.ObjectResponse(i, "inventory"))
 }

@@ -84,5 +84,5 @@ func CreateOutgoingTransaction(c echo.Context) error {
 		return c.JSON(code, helper.ErrorResponse(err.Error()))
 	}
 
-	return c.JSON(http.StatusOK, helper.ObjectResponse(trx, "transaction"))
+	return c.JSON(http.StatusCreated, helper.ObjectResponse(trx, "transaction"))
 }
