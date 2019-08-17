@@ -1,6 +1,7 @@
 package report
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -28,4 +29,24 @@ func InventoryReport(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, helper.ObjectResponse(res, "inventory_report"))
+}
+
+func InventoryReportCSV(c echo.Context) error {
+	var err error
+
+	db := config.GetDatabaseClient()
+
+	variantRepo := sqlite.NewVariantRepository(db)
+	orderRepo := sqlite.NewOrderRepository(db)
+
+	reportSvc := service.NewReportService(variantRepo, orderRepo)
+
+	res, err := reportSvc.GetInventoryReportCSV(false)
+	if err != nil {
+		logger.WithError(err).Error("fail to process export inventory report to csv")
+		return c.JSON(http.StatusInternalServerError, helper.ErrorResponse(err.Error()))
+	}
+
+	c.Response().Header().Set("Content-Disposition", fmt.Sprintf("%s; filename=%q", "attachment", "Inventory Report.csv"))
+	return c.Blob(http.StatusOK, "text/csv", res)
 }

@@ -35,4 +35,6 @@ func PublicRouter(g *echo.Group) {
 
 	g.GET("/reports/inventories", report.InventoryReport)
 	g.GET("/reports/sales", report.SalesReport)
+
+	g.GET("/reports/inventories/exportcsv", report.InventoryReportCSV)
 }

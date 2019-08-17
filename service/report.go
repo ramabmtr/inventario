@@ -1,8 +1,12 @@
 package service
 
 import (
+	"bytes"
+	"encoding/csv"
+	"fmt"
 	"time"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/ramabmtr/inventario/domain"
 	"github.com/ramabmtr/inventario/logger"
 	"github.com/shopspring/decimal"
@@ -85,6 +89,66 @@ func (c *reportService) GetInventoryReport(showEmptyStock bool) (res *domain.Inv
 		InventoryList:       inventoryList,
 	}
 
+	return
+}
+
+// data:
+//     Data tobe written in csv. If header is nil, data will written in csv in the same order as the map data
+// header:
+//     Add header data on csv, you can set position or hide some parts in data
+// autoDetectHeader:
+//     Will automatically set header based on key on data. this field ignored when header is not nil
+func (c *reportService) writeCSV(data []map[string]interface{}, header []string, autoDetectHeader bool) (res []byte, err error) {
+	var records [][]string
+
+	for k, row := range data {
+		var content []string
+
+		switch {
+		case header != nil:
+			for _, val := range header {
+				content = append(content, fmt.Sprintf("%v", row[val]))
+			}
+		case autoDetectHeader:
+			fallthrough
+		default:
+			for keyName, val := range row {
+				if header == nil && autoDetectHeader {
+					header = append(header, keyName)
+				}
+				content = append(content, fmt.Sprintf("%v", val))
+			}
+		}
+
+		// write header
+		if header != nil && k == 0 {
+			records = append(records, header)
+		}
+		records = append(records, content)
+	}
+
+	buffer := new(bytes.Buffer)
+	csvWriter := csv.NewWriter(buffer)
+	err = csvWriter.WriteAll(records)
+	return buffer.Bytes(), err
+}
+
+func (c *reportService) GetInventoryReportCSV(showEmptyStock bool) (res []byte, err error) {
+	r, err := c.GetInventoryReport(showEmptyStock)
+	if err != nil {
+		return
+	}
+
+	var records []map[string]interface{}
+	recordsByte, _ := jsoniter.Marshal(r.InventoryList)
+	err = jsoniter.Unmarshal(recordsByte, &records)
+	if err != nil {
+		return res, err
+	}
+
+	header := []string{"sku", "name", "size", "color", "total_available_item", "average_purchase_price", "total_item_price"}
+
+	res, err = c.writeCSV(records, header, false)
 	return
 }
 
