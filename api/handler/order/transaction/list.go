@@ -29,7 +29,7 @@ func GetTransactionList(c echo.Context) error {
 		startDateQuery = time.Now().UTC().Format(config.QueryDateFormatLayout)
 	}
 
-	endDateQuery := c.QueryParam("start_date")
+	endDateQuery := c.QueryParam("end_date")
 	if endDateQuery == "" {
 		endDateQuery = time.Now().UTC().Format(config.QueryDateFormatLayout)
 	}

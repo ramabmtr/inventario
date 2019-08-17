@@ -19,8 +19,9 @@ func InventoryReport(c echo.Context) error {
 
 	variantRepo := sqlite.NewVariantRepository(db)
 	orderRepo := sqlite.NewOrderRepository(db)
+	trxRepo := sqlite.NewTransactionRepository(db)
 
-	reportSvc := service.NewReportService(variantRepo, orderRepo)
+	reportSvc := service.NewReportService(variantRepo, orderRepo, trxRepo)
 
 	res, err := reportSvc.GetInventoryReport(false)
 	if err != nil {
@@ -38,8 +39,9 @@ func InventoryReportCSV(c echo.Context) error {
 
 	variantRepo := sqlite.NewVariantRepository(db)
 	orderRepo := sqlite.NewOrderRepository(db)
+	trxRepo := sqlite.NewTransactionRepository(db)
 
-	reportSvc := service.NewReportService(variantRepo, orderRepo)
+	reportSvc := service.NewReportService(variantRepo, orderRepo, trxRepo)
 
 	res, err := reportSvc.GetInventoryReportCSV(false)
 	if err != nil {

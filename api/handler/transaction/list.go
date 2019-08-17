@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo"
@@ -16,12 +17,14 @@ import (
 func GetTransactionList(c echo.Context) error {
 	var err error
 
+	trxType := strings.ToUpper(c.QueryParam("transaction_type"))
+
 	startDateQuery := c.QueryParam("start_date")
 	if startDateQuery == "" {
 		startDateQuery = time.Now().UTC().Format(config.QueryDateFormatLayout)
 	}
 
-	endDateQuery := c.QueryParam("start_date")
+	endDateQuery := c.QueryParam("end_date")
 	if endDateQuery == "" {
 		endDateQuery = time.Now().UTC().Format(config.QueryDateFormatLayout)
 	}
@@ -48,7 +51,9 @@ func GetTransactionList(c echo.Context) error {
 
 	trxSvc := service.NewTransactionService(trxRepo, variantRepo)
 
-	trx := domain.Transaction{}
+	trx := domain.Transaction{
+		Type: trxType,
+	}
 
 	trxs, err := trxSvc.GetTransactionList(trx, &startDate, &endDate)
 	if err != nil {
