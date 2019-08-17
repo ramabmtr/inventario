@@ -16,6 +16,7 @@ Inventory Management API
 ## Requirements
 
 You need this installed on your system to run locally
+- [SQLite](https://www.sqlite.org/)
 - [Go](https://golang.org/)
 - [Dep](https://golang.github.io/dep/)
 
@@ -33,6 +34,10 @@ or you can run `migrate.go` directly
 ```bash
 $ go run migrate.go up
 ```
+
+## API Documentation
+
+We provide [Postman Collection](docs/Inventario.postman_collection.json) for explore our API
 
 ## How To Run
 

@@ -1,0 +1,451 @@
+{
+	"info": {
+		"_postman_id": "cd53a8ef-6d33-4d2a-8c10-d39c112e58c4",
+		"name": "Requests",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Inventory",
+			"item": [
+				{
+					"name": "Create New Inventory",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"baju\",\n\t\"variants\": [\n\t\t{\n\t\t\t\"sku\": \"baju-ijo\",\n\t\t\t\"size\": \"L\",\n\t\t\t\"color\": \"ijo\"\n\t\t},\n\t\t{\n\t\t\t\"sku\": \"baju-merah\",\n\t\t\t\"size\": \"L\",\n\t\t\t\"color\": \"merah\"\n\t\t}\n\t]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/inventories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"inventories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inventory List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/inventories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"inventories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inventory Detail",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "40873252-b63e-4afe-8c07-c4d0e0531105",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/inventories/b600f59e-b96c-4544-a67c-c00851ef8f9e",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"inventories",
+								"b600f59e-b96c-4544-a67c-c00851ef8f9e"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Variant List",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "40873252-b63e-4afe-8c07-c4d0e0531105",
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/inventories/b600f59e-b96c-4544-a67c-c00851ef8f9e/variants",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"inventories",
+								"b600f59e-b96c-4544-a67c-c00851ef8f9e",
+								"variants"
+							]
+						},
+						"description": "Get all variant in an inventory"
+					},
+					"response": []
+				},
+				{
+					"name": "Create New Variant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"sku\": \"baju-hitam\",\n\t\"size\": \"M\",\n\t\"color\": \"hitam\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/inventories/b600f59e-b96c-4544-a67c-c00851ef8f9e/variants",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"inventories",
+								"b600f59e-b96c-4544-a67c-c00851ef8f9e",
+								"variants"
+							]
+						},
+						"description": "Will create new variant inside the inventory"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "Create New Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"variant_sku\": \"baju-merah\",\n\t\"quantity\": 30,\n\t\"price\": 55000,\n\t\"receipt\": \"receipt-baju-merah\"\n}"
+						},
+						"url": {
+							"raw": "http://localhost:8080/orders",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"orders"
+							]
+						},
+						"description": "To create an incoming transaction, you must create order first, then you can create transaction with this order_id"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/orders?",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders"
+							],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2019-08-15",
+									"description": "default value: today's date",
+									"disabled": true
+								},
+								{
+									"key": "end_date",
+									"value": "2019-08-17",
+									"description": "default value: today's date",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Order Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/orders/56abee52-fd33-449f-bd7a-a41dfeabb7d0",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"56abee52-fd33-449f-bd7a-a41dfeabb7d0"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Order Transaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"quantity\": 25\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/orders/56abee52-fd33-449f-bd7a-a41dfeabb7d0/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"orders",
+								"56abee52-fd33-449f-bd7a-a41dfeabb7d0",
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transaction",
+			"item": [
+				{
+					"name": "Create Outgoing Transaction",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "content-type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items\": [\n        {\n            \"variant_sku\": \"baju-merah\",\n            \"quantity\": 1,\n            \"price\": 87000\n        },\n        {\n            \"variant_sku\": \"baju-hitam\",\n            \"quantity\": 3,\n            \"price\": 85000\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/transactions",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Transaction List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/transactions?",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"transactions"
+							],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2019-08-15",
+									"disabled": true
+								},
+								{
+									"key": "end_date",
+									"value": "2019-08-17",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Report",
+			"item": [
+				{
+					"name": "Inventory Report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/reports/inventories",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reports",
+								"inventories"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Inventory Report CSV",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/reports/inventories/exportcsv",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reports",
+								"inventories",
+								"exportcsv"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sales Report",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/reports/sales?",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reports",
+								"sales"
+							],
+							"query": [
+								{
+									"key": "start_date",
+									"value": "2019-08-15",
+									"disabled": true
+								},
+								{
+									"key": "end_date",
+									"value": "2019-08-17",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Inventory Report CSV",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/reports/sales/exportcsv",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"reports",
+								"sales",
+								"exportcsv"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c60c4f8e-bcb1-4037-8bc2-5f851a18c732",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "59cbc169-e05c-4d0c-ac53-fd9457d5b7e9",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Ping",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/ping",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
