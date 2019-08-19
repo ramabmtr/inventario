@@ -1,3 +1,5 @@
+// +build !logrus
+
 package logger
 
 import (

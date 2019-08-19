@@ -10,8 +10,8 @@ import (
 	"github.com/ramabmtr/inventario/config"
 	"github.com/ramabmtr/inventario/domain"
 	"github.com/ramabmtr/inventario/helper"
-	"github.com/ramabmtr/inventario/logger"
 	"github.com/ramabmtr/inventario/repository/database/sqlite"
+	"github.com/ramabmtr/inventario/repository/logger"
 	"github.com/ramabmtr/inventario/service"
 )
 

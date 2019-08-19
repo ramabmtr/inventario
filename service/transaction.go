@@ -3,7 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
-	"github.com/ramabmtr/inventario/logger"
+	"github.com/ramabmtr/inventario/repository/logger"
 	"net/http"
 	"time"
 

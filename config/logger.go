@@ -1,6 +1,6 @@
 package config
 
-import "github.com/ramabmtr/inventario/logger"
+import "github.com/ramabmtr/inventario/repository/logger"
 
 func InitLogger() {
 	// setup logger with engine defined in `APP_LOG_ENGINE` env var

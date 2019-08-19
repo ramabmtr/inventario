@@ -1,11 +1,9 @@
-// +build main
-
 package main
 
 import (
 	"github.com/ramabmtr/inventario/api"
 	"github.com/ramabmtr/inventario/config"
-	"github.com/ramabmtr/inventario/logger"
+	"github.com/ramabmtr/inventario/repository/logger"
 )
 
 func init() {

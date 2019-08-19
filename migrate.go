@@ -16,7 +16,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/ramabmtr/inventario/config"
-	"github.com/ramabmtr/inventario/logger"
+	"github.com/ramabmtr/inventario/repository/logger"
 )
 
 const (

@@ -126,7 +126,7 @@
   version = "v3.3.10"
 
 [[projects]]
-  digest = "1:6e15357cae900fa1a8015c7fc9efdb406f72b644549a3422f3f1b7f465836a84"
+  digest = "1:e8e65826d60fd82637fb9df06ecd651191b599f4a8f72b86362012f288778320"
   name = "github.com/labstack/gommon"
   packages = [
     "bytes",
@@ -135,8 +135,8 @@
     "random",
   ]
   pruneopts = "UT"
-  revision = "ab0bfd9a5eba33a8c364bf3390d809ed23c31f97"
-  version = "v0.2.9"
+  revision = "4919956f6fb227b548f004da27c7c6b20fba499f"
+  version = "v0.3.0"
 
 [[projects]]
   digest = "1:6782ffc812e8e700e6952ede1e60487ff1fd9da489eff762985be662a7cfc431"

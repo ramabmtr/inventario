@@ -11,7 +11,7 @@ import (
 	AppMiddleware "github.com/ramabmtr/inventario/api/middleware"
 	"github.com/ramabmtr/inventario/config"
 	"github.com/ramabmtr/inventario/helper"
-	"github.com/ramabmtr/inventario/logger"
+	"github.com/ramabmtr/inventario/repository/logger"
 )
 
 type (
@@ -55,7 +55,7 @@ func Run() {
 
 	err := gracehttp.Serve(e.Server)
 	if err != nil {
-		logger.WithError(err).Fatal("Fail to initialize api...")
+		logger.WithError(err).Fatal("Fail to initialize API...")
 		return
 	}
 
