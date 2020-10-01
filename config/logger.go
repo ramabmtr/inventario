@@ -10,7 +10,7 @@ func InitLogger() {
 	case LogEngineStdlib:
 		fallthrough
 	default:
-		logger.SetLogger(logger.NewLogrusLogger())
+		logger.SetLogger(logger.NewStdLogger())
 	}
 
 	if Env.App.Debug {
